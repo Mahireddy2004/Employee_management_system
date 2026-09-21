@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// Configurable API base URL from Vite environment variables with fallback
+// Configurable API base URL from Vite environment variables with environment-aware fallback
 const API_BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) || 'http://localhost:5000/api';
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
+  (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
