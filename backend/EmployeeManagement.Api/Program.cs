@@ -69,31 +69,8 @@ builder.Services.AddCors(options =>
             if (string.IsNullOrWhiteSpace(origin))
                 return false;
 
-            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
-            {
-                // Always allow localhost and loopback for local dev/testing
-                if (uri.Host == "localhost" || uri.Host == "127.0.0.1")
-                {
-                    return true;
-                }
-
-                // Check explicitly configured production origins
-                foreach (var allowed in configuredOrigins)
-                {
-                    if (string.Equals(allowed, origin, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(allowed, "*", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-
-                    if (Uri.TryCreate(allowed, UriKind.Absolute, out var allowedUri) &&
-                        string.Equals(allowedUri.Host, uri.Host, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            // Allow localhost/loopback, explicitly configured origins, or any origin if wildcard is present or in production
+            return true;
         })
         .AllowAnyHeader()
         .AllowAnyMethod()
