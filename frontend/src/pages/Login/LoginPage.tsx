@@ -52,11 +52,25 @@ export const LoginPage: React.FC = () => {
       navigate('/dashboard', { replace: true });
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
+        const axiosErr = err as {
+          response?: {
+            status?: number;
+            data?: {
+              message?: string;
+              title?: string;
+              errors?: Record<string, string[]>;
+            };
+          };
+        };
         if (axiosErr.response?.status === 401) {
           setServerError('Invalid email or password. Please verify your credentials and try again.');
         } else if (axiosErr.response?.data?.message) {
           setServerError(axiosErr.response.data.message);
+        } else if (axiosErr.response?.data?.errors) {
+          const firstError = Object.values(axiosErr.response.data.errors).flat()[0];
+          setServerError(firstError || 'Validation error. Please verify your inputs.');
+        } else if (axiosErr.response?.data?.title) {
+          setServerError(axiosErr.response.data.title);
         } else {
           setServerError('Unable to connect to the authentication service. Please verify that the backend API is running.');
         }

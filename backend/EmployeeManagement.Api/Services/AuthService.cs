@@ -61,7 +61,7 @@ public class AuthService : IAuthService
         var emailNormalized = dto.Email.Trim().ToLowerInvariant();
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email.ToLower() == emailNormalized);
+            .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == emailNormalized);
 
         if (user == null)
         {

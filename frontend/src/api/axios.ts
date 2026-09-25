@@ -24,11 +24,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: handle 401 Unauthorized without redirect loops
+// Response interceptor: handle 401 Unauthorized for expired/revoked sessions on protected requests
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    if (error.response?.status === 401 && !isLoginRequest) {
       // Clear stored authentication state
       localStorage.removeItem('token');
       localStorage.removeItem('user');
