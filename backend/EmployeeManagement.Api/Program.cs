@@ -69,8 +69,38 @@ builder.Services.AddCors(options =>
             if (string.IsNullOrWhiteSpace(origin))
                 return false;
 
-            // Allow localhost/loopback, explicitly configured origins, or any origin if wildcard is present or in production
-            return true;
+            // Always permit localhost / loopback for local development and testing
+            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+            {
+                if (uri.Host == "localhost" || uri.Host == "127.0.0.1")
+                {
+                    return true;
+                }
+            }
+
+            // Allow all origins if wildcard is explicitly configured
+            if (configuredOrigins.Any(o => o == "*"))
+            {
+                return true;
+            }
+
+            // Validate against explicitly configured production frontend origins
+            foreach (var allowed in configuredOrigins)
+            {
+                if (string.Equals(allowed.TrimEnd('/'), origin.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (Uri.TryCreate(allowed, UriKind.Absolute, out var allowedUri) &&
+                    uri != null &&
+                    string.Equals(allowedUri.Host, uri.Host, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         })
         .AllowAnyHeader()
         .AllowAnyMethod()
@@ -154,12 +184,24 @@ app.UseAuthorization();
 // Route incoming HTTP requests to controllers
 app.MapControllers();
 
-// Database migration and seeding: strictly controlled per environment / configuration
-var applyMigrationsOnStartup = app.Environment.IsDevelopment()
-    || builder.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup", true);
+// Health check endpoint for cloud monitoring and container probes
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+   .WithName("HealthCheck")
+   .WithTags("Health")
+   .AllowAnonymous();
 
-var seedDemoData = app.Environment.IsDevelopment()
-    || builder.Configuration.GetValue<bool>("Database:SeedDemoData", true);
+// Database migration and seeding: strictly controlled per environment / configuration
+// In Development: enabled by default for developer convenience.
+// In Production: disabled by default for safety unless explicitly configured via environment variables.
+var applyMigrationsOnStartup = builder.Configuration.GetValue<bool>(
+    "Database:ApplyMigrationsOnStartup",
+    app.Environment.IsDevelopment()
+);
+
+var seedDemoData = builder.Configuration.GetValue<bool>(
+    "Database:SeedDemoData",
+    app.Environment.IsDevelopment()
+);
 
 if (applyMigrationsOnStartup || seedDemoData)
 {
