@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { AlertCircle, Building2, Eye, EyeOff, Lock, Mail, ShieldCheck, Users } from 'lucide-react';
+import { AlertCircle, Building2, Eye, EyeOff, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/common/Button';
 
@@ -95,10 +95,10 @@ export const LoginPage: React.FC = () => {
         {/* Header Branding */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white mb-4">
-            <Users className="w-7 h-7" />
+            <span className="text-2xl font-bold" aria-hidden="true">N</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white m-0">
-            Employee Management
+            Nynik
           </h1>
           <p className="text-sm text-slate-400 mt-2">
             Secure Human Resources & Operations Portal

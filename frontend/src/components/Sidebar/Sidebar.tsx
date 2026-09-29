@@ -46,14 +46,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/80">
           <div className="flex items-center space-x-3">
             <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-xs shadow-indigo-500/20">
-              <Building2 className="w-5 h-5" />
+              <span className="block w-5 h-5 text-center font-bold leading-5" aria-hidden="true">N</span>
             </div>
             <div>
               <span className="font-bold text-white text-base tracking-tight block leading-none">
-                EMS Suite
+                Nynik
               </span>
               <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 block mt-1">
-                Enterprise HR
+                Technologies
               </span>
             </div>
           </div>

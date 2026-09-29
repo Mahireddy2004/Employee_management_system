@@ -38,7 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
         {/* Portal Breadcrumb / Title */}
         <div className="flex items-center space-x-2">
           <span className="font-semibold text-slate-800 text-sm sm:text-base tracking-tight">
-            Employee Portal
+            Nynik Portal
           </span>
           <span className="hidden sm:inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
             <Shield className="w-3 h-3 text-indigo-500" />
