@@ -27,7 +27,7 @@ public static class DatabaseSeeder
         {
             var departments = new List<Department>
             {
-                new() { Name = "Engineering", Budget = 750000m, Location = "Building A, Floor 3" },
+                new() { Name = "Engineering", Budget = 500000m, Location = "Building A, Floor 3" },
                 new() { Name = "Human Resources", Budget = 200000m, Location = "Building B, Floor 1" },
                 new() { Name = "Marketing", Budget = 350000m, Location = "Building A, Floor 1" },
                 new() { Name = "Finance", Budget = 400000m, Location = "Building B, Floor 2" }
