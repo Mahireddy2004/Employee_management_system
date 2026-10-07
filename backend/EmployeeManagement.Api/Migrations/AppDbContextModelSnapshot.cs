@@ -160,6 +160,66 @@ namespace EmployeeManagement.Api.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("EmployeeManagement.Api.Models.LeaveRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("LeaveType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ProcessedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int>("TotalDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_LeaveRequests_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_LeaveRequests_Status");
+
+                    b.ToTable("LeaveRequests");
+                });
+
             modelBuilder.Entity("EmployeeManagement.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -221,6 +281,17 @@ namespace EmployeeManagement.Api.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("EmployeeManagement.Api.Models.LeaveRequest", b =>
+                {
+                    b.HasOne("EmployeeManagement.Api.Models.Employee", "Employee")
+                        .WithMany("LeaveRequests")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("EmployeeManagement.Api.Models.Department", b =>
                 {
                     b.Navigation("Employees");
@@ -229,6 +300,8 @@ namespace EmployeeManagement.Api.Migrations
             modelBuilder.Entity("EmployeeManagement.Api.Models.Employee", b =>
                 {
                     b.Navigation("Attendances");
+
+                    b.Navigation("LeaveRequests");
                 });
 #pragma warning restore 612, 618
         }

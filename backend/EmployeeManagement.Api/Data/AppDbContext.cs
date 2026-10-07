@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Attendance> Attendance => Set<Attendance>();
+    public DbSet<LeaveRequest> LeaveRequests => Set<LeaveRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -107,6 +108,34 @@ public class AppDbContext : DbContext
 
             // Global Query Filter: Automatically filter attendance of soft-deleted employees
             entity.HasQueryFilter(a => !a.Employee!.IsDeleted);
+        });
+
+        // LeaveRequest Configuration
+        modelBuilder.Entity<LeaveRequest>(entity =>
+        {
+            entity.HasKey(l => l.Id);
+            entity.Property(l => l.LeaveType).IsRequired().HasMaxLength(50);
+            entity.Property(l => l.Status).IsRequired().HasMaxLength(20);
+            entity.Property(l => l.Reason).IsRequired().HasMaxLength(500);
+            entity.Property(l => l.AdminNotes).HasMaxLength(500);
+            entity.Property(l => l.ProcessedBy).HasMaxLength(100);
+
+            // Index: EmployeeId
+            entity.HasIndex(l => l.EmployeeId)
+                  .HasDatabaseName("IX_LeaveRequests_EmployeeId");
+
+            // Index: Status
+            entity.HasIndex(l => l.Status)
+                  .HasDatabaseName("IX_LeaveRequests_Status");
+
+            // Global Query Filter: Filter out leave requests for soft-deleted employees
+            entity.HasQueryFilter(l => !l.Employee!.IsDeleted);
+
+            // Relationship
+            entity.HasOne(l => l.Employee)
+                  .WithMany(e => e.LeaveRequests)
+                  .HasForeignKey(l => l.EmployeeId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 

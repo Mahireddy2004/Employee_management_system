@@ -15,6 +15,7 @@ const EmployeesPage = lazy(() => import('./pages/Employees/EmployeesPage'));
 const DepartmentsPage = lazy(() => import('./pages/Departments/DepartmentsPage'));
 const AttendancePage = lazy(() => import('./pages/Attendance/AttendancePage'));
 const ReportsPage = lazy(() => import('./pages/Reports/ReportsPage'));
+const LeavesPage = lazy(() => import('./pages/Leaves/LeavesPage'));
 
 /**
  * Fallback redirect component:
@@ -50,6 +51,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
+            <Route path="/leaves" element={<LeavesPage />} />
             <Route path="/reports" element={<ReportsPage />} />
           </Route>
         </Route>

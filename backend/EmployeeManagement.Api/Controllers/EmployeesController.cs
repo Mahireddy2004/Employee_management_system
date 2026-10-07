@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using EmployeeManagement.Api.Data;
 using EmployeeManagement.Api.DTOs;
 using EmployeeManagement.Api.Models;
@@ -82,6 +83,36 @@ public class EmployeesController : ControllerBase
         };
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// GET /api/employees/me
+    /// Fetches the profile of the currently authenticated employee based on JWT claim.
+    /// </summary>
+    [HttpGet("me")]
+    public async Task<ActionResult<EmployeeResponseDto>> GetMyProfile()
+    {
+        var email = User.FindFirst(ClaimTypes.Email)?.Value
+            ?? User.FindFirst("email")?.Value
+            ?? User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new { message = "User identity claim not found in token." });
+        }
+
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        var employee = await _context.Employees
+            .Include(e => e.Department)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Email.ToLower() == normalizedEmail);
+
+        if (employee == null)
+        {
+            return NotFound(new { message = "No employee record associated with current login." });
+        }
+
+        return Ok(ToDto(employee));
     }
 
     /// <summary>

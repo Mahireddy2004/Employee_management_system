@@ -20,9 +20,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
   };
 
   // Safe fallback values to avoid displaying 'undefined' or 'null'
-  const displayName = user?.username?.trim() || user?.email?.trim() || 'Administrator';
-  const displayRole = user?.role?.trim() || 'HR Admin';
-  const initial = displayName.charAt(0).toUpperCase() || 'A';
+  const isAdmin = user?.role === 'Admin';
+  const displayName = user?.username?.trim() || user?.email?.trim() || (isAdmin ? 'Administrator' : 'Staff Employee');
+  const displayRole = isAdmin ? 'Manager / HR Admin' : 'Staff Employee';
+  const initial = displayName.charAt(0).toUpperCase() || (isAdmin ? 'A' : 'E');
 
   return (
     <header className="h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border-b border-slate-200/90 dark:border-slate-800 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-2xs transition-colors duration-200">
@@ -43,8 +44,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
             Nynik Portal
           </span>
           <span className="hidden sm:inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-            <Shield className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
-            <span>Secured</span>
+            <Shield className={`w-3 h-3 ${isAdmin ? 'text-indigo-500' : 'text-emerald-500'}`} />
+            <span>{isAdmin ? 'Manager Portal' : 'Employee Portal'}</span>
           </span>
         </div>
       </div>

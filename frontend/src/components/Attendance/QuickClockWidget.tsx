@@ -9,17 +9,23 @@ import { Button } from '../common/Button';
 
 export interface QuickClockWidgetProps {
   onAttendanceChanged?: () => void;
+  defaultEmployeeId?: number;
+  lockEmployee?: boolean;
 }
 
 /**
  * Quick Clock-In / Clock-Out widget for rapid daily attendance tracking.
  * Features a live digital clock, instant employee selection, and one-click clock actions.
  */
-export const QuickClockWidget: React.FC<QuickClockWidgetProps> = ({ onAttendanceChanged }) => {
+export const QuickClockWidget: React.FC<QuickClockWidgetProps> = ({
+  onAttendanceChanged,
+  defaultEmployeeId,
+  lockEmployee = false,
+}) => {
   const toast = useToast();
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [selectedEmpId, setSelectedEmpId] = useState<number | null>(null);
+  const [selectedEmpId, setSelectedEmpId] = useState<number | null>(defaultEmployeeId ?? null);
   const [todayAttendance, setTodayAttendance] = useState<Attendance | null>(null);
   const [isLoadingRecord, setIsLoadingRecord] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -60,7 +66,7 @@ export const QuickClockWidget: React.FC<QuickClockWidgetProps> = ({ onAttendance
           const list = res.items ?? [];
           setEmployees(list);
           if (list.length > 0 && selectedEmpId === null) {
-            setSelectedEmpId(list[0].id);
+            setSelectedEmpId(defaultEmployeeId ?? list[0].id);
           }
         }
       } catch (err) {
@@ -71,7 +77,13 @@ export const QuickClockWidget: React.FC<QuickClockWidgetProps> = ({ onAttendance
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [defaultEmployeeId]);
+
+  useEffect(() => {
+    if (defaultEmployeeId) {
+      setSelectedEmpId(defaultEmployeeId);
+    }
+  }, [defaultEmployeeId]);
 
   // Fetch today's attendance for the selected employee
   const checkTodayStatus = useCallback(async (empId: number) => {
@@ -227,26 +239,38 @@ export const QuickClockWidget: React.FC<QuickClockWidgetProps> = ({ onAttendance
         {/* Right Side: Employee Selector & Clock Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           {/* Employee Selection */}
-          <div className="flex items-center space-x-2 min-w-[220px]">
-            <User className="w-4 h-4 text-indigo-300 shrink-0" />
-            <select
-              aria-label="Select Employee"
-              value={selectedEmpId ?? ''}
-              onChange={(e) => setSelectedEmpId(Number(e.target.value))}
-              disabled={isSubmitting || employees.length === 0}
-              className="w-full bg-slate-800/80 text-white border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-            >
-              {employees.length === 0 ? (
-                <option value="">No Active Employees</option>
-              ) : (
-                employees.map((emp) => (
-                  <option key={emp.id} value={emp.id} className="bg-slate-900 text-white">
-                    {emp.fullName || `${emp.firstName} ${emp.lastName}`} (#{emp.id})
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
+          {lockEmployee ? (
+            <div className="flex items-center space-x-2 px-3.5 py-2 bg-slate-800/90 border border-slate-700 rounded-xl">
+              <User className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold text-slate-200">
+                {employees.find((e) => e.id === selectedEmpId)?.fullName ||
+                  (employees.find((e) => e.id === selectedEmpId)
+                    ? `${employees.find((e) => e.id === selectedEmpId)!.firstName} ${employees.find((e) => e.id === selectedEmpId)!.lastName}`
+                    : 'Personal Clock')}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 min-w-[220px]">
+              <User className="w-4 h-4 text-indigo-300 shrink-0" />
+              <select
+                aria-label="Select Employee"
+                value={selectedEmpId ?? ''}
+                onChange={(e) => setSelectedEmpId(Number(e.target.value))}
+                disabled={isSubmitting || employees.length === 0}
+                className="w-full bg-slate-800/80 text-white border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+              >
+                {employees.length === 0 ? (
+                  <option value="">No Active Employees</option>
+                ) : (
+                  employees.map((emp) => (
+                    <option key={emp.id} value={emp.id} className="bg-slate-900 text-white">
+                      {emp.fullName || `${emp.firstName} ${emp.lastName}`} (#{emp.id})
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          )}
 
           {/* Status Badge & Action Button */}
           <div className="flex items-center space-x-3">

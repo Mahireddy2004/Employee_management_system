@@ -58,4 +58,8 @@ public class Employee
     // Navigation property: Employee 1 -> many Attendance records
     [JsonIgnore]
     public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
+
+    // Navigation property: Employee 1 -> many Leave requests
+    [JsonIgnore]
+    public ICollection<LeaveRequest> LeaveRequests { get; set; } = new List<LeaveRequest>();
 }

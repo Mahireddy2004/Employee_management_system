@@ -37,10 +37,10 @@ public static class DatabaseSeeder
             await context.SaveChangesAsync();
         }
 
-        var engineering = await context.Departments.FirstAsync(d => d.Name == "Engineering");
-        var hr = await context.Departments.FirstAsync(d => d.Name == "Human Resources");
-        var marketing = await context.Departments.FirstAsync(d => d.Name == "Marketing");
-        var finance = await context.Departments.FirstAsync(d => d.Name == "Finance");
+        var engineering = await context.Departments.FirstOrDefaultAsync(d => d.Name == "Software Development" || d.Name == "Engineering") ?? await context.Departments.FirstAsync();
+        var hr = await context.Departments.FirstOrDefaultAsync(d => d.Name.Contains("Human Resources")) ?? engineering;
+        var marketing = await context.Departments.FirstOrDefaultAsync(d => d.Name.Contains("Quality Assurance") || d.Name == "Marketing") ?? engineering;
+        var finance = await context.Departments.FirstOrDefaultAsync(d => d.Name.Contains("DevOps") || d.Name == "Finance") ?? engineering;
 
         // 3. Seed 20 Employees across the 4 departments
         if (!await context.Employees.AnyAsync())
@@ -277,5 +277,88 @@ public static class DatabaseSeeder
         }
 
         await context.SaveChangesAsync();
+
+        // 8. Ensure Employee User Logins exist for Employees
+        var allEmployees = await context.Employees.ToListAsync();
+        var defaultPasswordHash = BCrypt.Net.BCrypt.HashPassword("Employee@123");
+
+        foreach (var emp in allEmployees)
+        {
+            if (!await context.Users.AnyAsync(u => u.Email.ToLower() == emp.Email.ToLower()))
+            {
+                context.Users.Add(new User
+                {
+                    Username = $"{emp.FirstName} {emp.LastName}".Trim(),
+                    Email = emp.Email,
+                    PasswordHash = defaultPasswordHash,
+                    Role = "Employee",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+        await context.SaveChangesAsync();
+
+        // 9. Seed Sample Leave Requests if none exist
+        if (!await context.LeaveRequests.AnyAsync())
+        {
+            var devEmp = await context.Employees.FirstOrDefaultAsync(e => e.Department != null && e.Department.Name.Contains("Software"));
+            var hrEmp = await context.Employees.FirstOrDefaultAsync(e => e.Department != null && e.Department.Name.Contains("Human Resources"));
+            var qaEmp = await context.Employees.FirstOrDefaultAsync(e => e.Department != null && e.Department.Name.Contains("Quality"));
+
+            var today = DateTime.UtcNow.Date;
+
+            if (hrEmp != null)
+            {
+                context.LeaveRequests.Add(new LeaveRequest
+                {
+                    EmployeeId = hrEmp.Id,
+                    LeaveType = LeaveType.Casual,
+                    StartDate = today.AddDays(2),
+                    EndDate = today.AddDays(3),
+                    TotalDays = 2,
+                    Reason = "Family event in hometown",
+                    Status = LeaveStatus.Approved,
+                    AdminNotes = "Approved by Operations Head.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    ProcessedAt = DateTime.UtcNow,
+                    ProcessedBy = "admin@example.com"
+                });
+            }
+
+            if (devEmp != null)
+            {
+                context.LeaveRequests.Add(new LeaveRequest
+                {
+                    EmployeeId = devEmp.Id,
+                    LeaveType = LeaveType.Annual,
+                    StartDate = today.AddDays(5),
+                    EndDate = today.AddDays(8),
+                    TotalDays = 4,
+                    Reason = "Annual family vacation and travel",
+                    Status = LeaveStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+
+            if (qaEmp != null)
+            {
+                context.LeaveRequests.Add(new LeaveRequest
+                {
+                    EmployeeId = qaEmp.Id,
+                    LeaveType = LeaveType.Sick,
+                    StartDate = today.AddDays(-2),
+                    EndDate = today.AddDays(-1),
+                    TotalDays = 2,
+                    Reason = "Viral fever medical rest",
+                    Status = LeaveStatus.Approved,
+                    AdminNotes = "Medical certificate acknowledged.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    ProcessedAt = DateTime.UtcNow.AddDays(-2),
+                    ProcessedBy = "admin@example.com"
+                });
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }

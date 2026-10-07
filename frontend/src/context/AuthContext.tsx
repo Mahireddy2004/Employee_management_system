@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { LoginRequest, User } from '../types/auth';
+import type { LoginRequest, RegisterRequest, User } from '../types/auth';
 import { authApi } from '../api/authApi';
 
 interface AuthContextType {
@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
 }
 
@@ -44,6 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(response.user));
   };
 
+  const register = async (data: RegisterRequest) => {
+    await authApi.register(data);
+    await login({ email: data.email, password: data.password });
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -60,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading: isLoading,
         isLoading,
         login,
+        register,
         logout,
       }}
     >

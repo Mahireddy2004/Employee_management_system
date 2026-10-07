@@ -21,6 +21,11 @@ export const employeeApi = {
     return response.data;
   },
 
+  getMyProfile: async (): Promise<Employee> => {
+    const response = await api.get<Employee>('/employees/me');
+    return response.data;
+  },
+
   create: async (data: CreateEmployeeRequest): Promise<Employee> => {
     const response = await api.post<Employee>('/employees', data);
     return response.data;

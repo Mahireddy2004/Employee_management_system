@@ -3,27 +3,41 @@ import { NavLink } from 'react-router-dom';
 import {
   Building2,
   CalendarCheck,
+  CalendarDays,
   FileSpreadsheet,
   LayoutDashboard,
   ShieldCheck,
+  UserCheck,
   Users,
   X,
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-const navigationItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Employees', path: '/employees', icon: Users },
-  { name: 'Departments', path: '/departments', icon: Building2 },
-  { name: 'Attendance', path: '/attendance', icon: CalendarCheck },
-  { name: 'Reports', path: '/reports', icon: FileSpreadsheet },
-];
-
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
+
+  const navigationItems = isAdmin
+    ? [
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Employees', path: '/employees', icon: Users },
+        { name: 'Departments', path: '/departments', icon: Building2 },
+        { name: 'Attendance', path: '/attendance', icon: CalendarCheck },
+        { name: 'Leave Approvals', path: '/leaves', icon: CalendarDays },
+        { name: 'Reports', path: '/reports', icon: FileSpreadsheet },
+      ]
+    : [
+        { name: 'My Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Department Hub', path: '/departments', icon: Building2 },
+        { name: 'My Attendance', path: '/attendance', icon: CalendarCheck },
+        { name: 'Leave Applications', path: '/leaves', icon: CalendarDays },
+      ];
+
   return (
     <>
       {/* Mobile Backdrop Overlay */}
@@ -46,7 +60,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/80">
           <div className="flex items-center space-x-3">
             <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-xs shadow-indigo-500/20">
-              <span className="block w-5 h-5 text-center font-bold leading-5" aria-hidden="true">N</span>
+              <span className="block w-5 h-5 text-center font-bold leading-5" aria-hidden="true">
+                N
+              </span>
             </div>
             <div>
               <span className="font-bold text-white text-base tracking-tight block leading-none">
@@ -73,9 +89,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
 
         {/* Navigation Links */}
         <nav className="flex-1 px-3.5 py-6 space-y-1.5 overflow-y-auto">
-          <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Main Menu
+          <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <span>{isAdmin ? 'Management Menu' : 'Employee Portal'}</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider ${
+                isAdmin
+                  ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60'
+                  : 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
+              }`}
+            >
+              {isAdmin ? 'Admin' : 'Staff'}
+            </span>
           </div>
+
           {navigationItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -101,8 +127,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         {/* System Status / Footer */}
         <div className="p-4 border-t border-slate-800/80 bg-slate-900/50">
           <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span className="truncate">Active RBAC Session</span>
+            {isAdmin ? (
+              <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0" />
+            ) : (
+              <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            )}
+            <span className="truncate">
+              {isAdmin ? 'Admin Management Mode' : 'Employee Self-Service'}
+            </span>
           </div>
           <div className="text-[11px] text-slate-500 mt-1 pl-6">Version 1.0.0</div>
         </div>
