@@ -1678,14 +1678,14 @@ export const EmployeesPage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="modal-title"
         >
-          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-fadeIn">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div>
-                <h3 id="modal-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                   {employeeToEdit ? 'Edit Employee Details' : 'Add New Employee'}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {employeeToEdit
                     ? 'Update employee record and organizational status.'
                     : 'Fill in required information to register a new staff member.'}
@@ -1695,7 +1695,7 @@ export const EmployeesPage: React.FC = () => {
                 type="button"
                 onClick={() => !isSaving && setIsModalOpen(false)}
                 disabled={isSaving}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -1709,7 +1709,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-first-name"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     First Name <span className="text-rose-500">*</span>
                   </label>
@@ -1722,14 +1722,14 @@ export const EmployeesPage: React.FC = () => {
                       if (formErrors.firstName) setFormErrors({ ...formErrors, firstName: '' });
                     }}
                     placeholder="Jane"
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.firstName
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                   {formErrors.firstName && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">
                       {formErrors.firstName}
                     </p>
                   )}
@@ -1739,7 +1739,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-last-name"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Last Name <span className="text-rose-500">*</span>
                   </label>
@@ -1752,14 +1752,14 @@ export const EmployeesPage: React.FC = () => {
                       if (formErrors.lastName) setFormErrors({ ...formErrors, lastName: '' });
                     }}
                     placeholder="Doe"
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.lastName
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                   {formErrors.lastName && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">
                       {formErrors.lastName}
                     </p>
                   )}
@@ -1771,7 +1771,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-email"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Work Email <span className="text-rose-500">*</span>
                   </label>
@@ -1784,14 +1784,14 @@ export const EmployeesPage: React.FC = () => {
                       if (formErrors.email) setFormErrors({ ...formErrors, email: '' });
                     }}
                     placeholder="jane.doe@company.com"
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.email
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                   {formErrors.email && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.email}</p>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.email}</p>
                   )}
                 </div>
 
@@ -1799,7 +1799,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-phone"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Phone Number
                   </label>
@@ -1812,14 +1812,14 @@ export const EmployeesPage: React.FC = () => {
                       if (formErrors.phone) setFormErrors({ ...formErrors, phone: '' });
                     }}
                     placeholder="+91 98765 43210"
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.phone
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                   {formErrors.phone && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.phone}</p>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.phone}</p>
                   )}
                 </div>
               </div>
@@ -1829,7 +1829,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-dept"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Department <span className="text-rose-500">*</span>
                   </label>
@@ -1840,10 +1840,10 @@ export const EmployeesPage: React.FC = () => {
                       setFormData({ ...formData, departmentId: e.target.value });
                       if (formErrors.departmentId) setFormErrors({ ...formErrors, departmentId: '' });
                     }}
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.departmentId
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   >
                     <option value="">Select a Department</option>
@@ -1854,7 +1854,7 @@ export const EmployeesPage: React.FC = () => {
                     ))}
                   </select>
                   {formErrors.departmentId && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">
                       {formErrors.departmentId}
                     </p>
                   )}
@@ -1864,7 +1864,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-status"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Status <span className="text-rose-500">*</span>
                   </label>
@@ -1874,7 +1874,7 @@ export const EmployeesPage: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.value as EmployeeStatus })
                     }
-                    className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100"
                   >
                     <option value="Active">Active</option>
                     <option value="OnLeave">On Leave</option>
@@ -1888,7 +1888,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-hire-date"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Hire Date <span className="text-rose-500">*</span>
                   </label>
@@ -1900,14 +1900,14 @@ export const EmployeesPage: React.FC = () => {
                       setFormData({ ...formData, hireDate: e.target.value });
                       if (formErrors.hireDate) setFormErrors({ ...formErrors, hireDate: '' });
                     }}
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.hireDate
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                   {formErrors.hireDate && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">
                       {formErrors.hireDate}
                     </p>
                   )}
@@ -1917,7 +1917,7 @@ export const EmployeesPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="emp-salary"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Annual Salary (₹) <span className="text-rose-500">*</span>
                   </label>
@@ -1936,21 +1936,21 @@ export const EmployeesPage: React.FC = () => {
                         if (formErrors.salary) setFormErrors({ ...formErrors, salary: '' });
                       }}
                       placeholder="850000"
-                      className={`w-full pl-9 pr-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                      className={`w-full pl-9 pr-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                         formErrors.salary
-                          ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                          : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                          ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                       }`}
                     />
                   </div>
                   {formErrors.salary && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.salary}</p>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.salary}</p>
                   )}
                 </div>
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3">
                 <Button
                   type="button"
                   variant="outline"
@@ -1987,22 +1987,22 @@ export const EmployeesPage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="delete-dialog-title"
         >
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 p-6 space-y-4 animate-fadeIn">
-            <div className="flex items-center space-x-3.5 text-rose-600">
-              <div className="p-3 bg-rose-50 rounded-xl">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 p-6 space-y-4 animate-fadeIn">
+            <div className="flex items-center space-x-3.5 text-rose-600 dark:text-rose-400">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/60 rounded-xl">
                 <UserX className="w-6 h-6" />
               </div>
               <div>
-                <h3 id="delete-dialog-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 id="delete-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                   Confirm Employee Deletion
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">This action cannot be undone.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">This action cannot be undone.</p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Are you sure you want to permanently delete{' '}
-              <strong className="text-slate-900 font-semibold">{deleteTarget.fullName}</strong>{' '}
+              <strong className="text-slate-900 dark:text-slate-100 font-semibold">{deleteTarget.fullName}</strong>{' '}
               (ID: #{deleteTarget.id})? All historical attendance and payroll associations will be
               affected.
             </p>
@@ -2038,22 +2038,22 @@ export const EmployeesPage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="bulk-delete-title"
         >
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 p-6 space-y-4 animate-fadeIn">
-            <div className="flex items-center space-x-3.5 text-rose-600">
-              <div className="p-3 bg-rose-50 rounded-xl">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 p-6 space-y-4 animate-fadeIn">
+            <div className="flex items-center space-x-3.5 text-rose-600 dark:text-rose-400">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/60 rounded-xl">
                 <Trash2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 id="bulk-delete-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 id="bulk-delete-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                   Confirm Bulk Deletion
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Permanent batch removal</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Permanent batch removal</p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Are you sure you want to permanently delete{' '}
-              <strong className="text-rose-600 font-bold">{selectedIds.size} selected employee(s)</strong>?
+              <strong className="text-rose-600 dark:text-rose-400 font-bold">{selectedIds.size} selected employee(s)</strong>?
               This will remove their profile records, attendance logs, and payroll associations from
               the database. This action cannot be easily undone.
             </p>
@@ -2089,18 +2089,18 @@ export const EmployeesPage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="import-dialog-title"
         >
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-fadeIn">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
                   <FileSpreadsheet className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 id="import-dialog-title" className="text-lg font-bold text-slate-900 m-0">
+                  <h3 id="import-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                     Import Employees via CSV
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Batch onboard staff records using formatted CSV data.
                   </p>
                 </div>
@@ -2109,7 +2109,7 @@ export const EmployeesPage: React.FC = () => {
                 type="button"
                 onClick={() => !isImporting && setIsImportModalOpen(false)}
                 disabled={isImporting}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -2119,34 +2119,34 @@ export const EmployeesPage: React.FC = () => {
             {/* Modal Body */}
             <div className="p-6 space-y-5 overflow-y-auto flex-1">
               {/* Department Reference Box */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5">
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Valid Department IDs in System</span>
                 </p>
                 <div className="flex flex-wrap gap-2 text-xs">
                   {departments.map((d) => (
                     <span
                       key={d.id}
-                      className="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-slate-700 font-medium"
+                      className="px-2.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium"
                     >
-                      ID <strong className="text-indigo-600 font-mono">{d.id}</strong>: {d.name}
+                      ID <strong className="text-indigo-600 dark:text-indigo-400 font-mono">{d.id}</strong>: {d.name}
                     </span>
                   ))}
                   {departments.length === 0 && (
                     <span className="text-slate-400">Loading departments...</span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2">
-                  Each row's <code className="text-indigo-600 bg-indigo-50 px-1 rounded">DepartmentId</code> must match an existing numeric department ID shown above.
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                  Each row's <code className="text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-1 rounded">DepartmentId</code> must match an existing numeric department ID shown above.
                 </p>
               </div>
 
               {/* Template Download & Instructions */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 rounded-xl">
                 <div>
-                  <h4 className="text-xs font-bold text-indigo-900 m-0">Need the standard CSV structure?</h4>
-                  <p className="text-xs text-indigo-700 mt-0.5">
+                  <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 m-0">Need the standard CSV structure?</h4>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-0.5">
                     Download our ready-to-use CSV template pre-configured with the required headers.
                   </p>
                 </div>
@@ -2155,7 +2155,7 @@ export const EmployeesPage: React.FC = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleDownloadTemplate}
-                  className="bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-50 shrink-0 flex items-center space-x-1.5 text-xs font-semibold"
+                  className="bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 shrink-0 flex items-center space-x-1.5 text-xs font-semibold"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Template</span>
@@ -2166,15 +2166,15 @@ export const EmployeesPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="csv-upload"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Select CSV File (.csv)
                 </label>
-                <div className="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-indigo-400 transition-colors bg-slate-50/50">
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors bg-slate-50/50 dark:bg-slate-800/40">
+                  <Upload className="w-8 h-8 text-slate-400 dark:text-slate-500 mx-auto mb-2" />
                   <label
                     htmlFor="csv-upload"
-                    className="relative cursor-pointer font-semibold text-sm text-indigo-600 hover:text-indigo-500"
+                    className="relative cursor-pointer font-semibold text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
                   >
                     <span>Click to browse</span>
                     <input
@@ -2185,12 +2185,12 @@ export const EmployeesPage: React.FC = () => {
                       className="sr-only"
                     />
                   </label>
-                  <p className="text-xs text-slate-500 mt-1">or drag and drop your .csv file here</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">or drag and drop your .csv file here</p>
                   {importFile && (
-                    <div className="mt-3 inline-flex items-center space-x-2 px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700">
-                      <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
+                    <div className="mt-3 inline-flex items-center space-x-2 px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200">
+                      <FileSpreadsheet className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <span>{importFile.name}</span>
-                      <span className="text-slate-400">({(importFile.size / 1024).toFixed(1)} KB)</span>
+                      <span className="text-slate-400 dark:text-slate-500">({(importFile.size / 1024).toFixed(1)} KB)</span>
                     </div>
                   )}
                 </div>
@@ -2198,19 +2198,19 @@ export const EmployeesPage: React.FC = () => {
 
               {/* Validation Status & Errors */}
               {importErrors.length > 0 && (
-                <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
-                  <div className="flex items-center space-x-2 text-rose-800 text-xs font-bold uppercase tracking-wider">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl space-y-2">
+                  <div className="flex items-center space-x-2 text-rose-800 dark:text-rose-300 text-xs font-bold uppercase tracking-wider">
+                    <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                     <span>CSV Validation Issues ({importErrors.length})</span>
                   </div>
-                  <ul className="text-xs text-rose-700 space-y-1 list-disc list-inside max-h-36 overflow-y-auto">
+                  <ul className="text-xs text-rose-700 dark:text-rose-300 space-y-1 list-disc list-inside max-h-36 overflow-y-auto">
                     {importErrors.slice(0, 10).map((err, idx) => (
                       <li key={idx} className="leading-snug">
                         {err}
                       </li>
                     ))}
                     {importErrors.length > 10 && (
-                      <li className="text-rose-500 italic">
+                      <li className="text-rose-500 dark:text-rose-400 italic">
                         ...and {importErrors.length - 10} more errors. Fix these before importing.
                       </li>
                     )}
@@ -2220,14 +2220,14 @@ export const EmployeesPage: React.FC = () => {
 
               {/* Parsed Rows Preview */}
               {parsedRows.length > 0 && importErrors.length === 0 && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
-                  <div className="flex items-center space-x-2.5 text-emerald-800 text-xs font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center space-x-2.5 text-emerald-800 dark:text-emerald-300 text-xs font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>
                       <strong>{parsedRows.length}</strong> valid employee records parsed and ready for import.
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                     Validated
                   </span>
                 </div>
@@ -2235,7 +2235,7 @@ export const EmployeesPage: React.FC = () => {
             </div>
 
             {/* Modal Actions */}
-            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end space-x-3 bg-slate-50/50">
+            <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3 bg-slate-50/50 dark:bg-slate-900/50">
               <Button
                 type="button"
                 variant="outline"

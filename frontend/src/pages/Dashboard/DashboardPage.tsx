@@ -631,15 +631,15 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header with Title and Refresh Trigger */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 m-0">Executive Dashboard</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">Executive Dashboard</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               Manager Portal
             </span>
           </div>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Real-time workforce headcount, operational KPIs, salary payroll, and attendance analytics.
           </p>
         </div>
@@ -650,7 +650,7 @@ export const DashboardPage: React.FC = () => {
             onClick={() => fetchAdminData(true)}
             isLoading={isRefreshing}
             disabled={isRefreshing}
-            className="flex items-center space-x-2 text-slate-700 hover:text-indigo-600"
+            className="flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>{isRefreshing ? 'Refreshing...' : 'Refresh Data'}</span>
@@ -660,9 +660,9 @@ export const DashboardPage: React.FC = () => {
 
       {/* Error Alert with Retry button */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center justify-between gap-4 shadow-sm">
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center space-x-3">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
             <p className="text-sm font-medium m-0">{error}</p>
           </div>
           <Button variant="danger" size="sm" onClick={() => fetchAdminData(summary !== null)}>
@@ -673,16 +673,16 @@ export const DashboardPage: React.FC = () => {
 
       {/* Pending Leave Requests Manager Alert Banner */}
       {pendingLeavesCount > 0 && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/80 text-amber-900 flex items-center justify-between gap-4 shadow-sm">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/80 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 flex items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-amber-500 text-white rounded-xl">
               <CalendarCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-amber-950 m-0">
+              <h4 className="text-sm font-bold text-amber-950 dark:text-amber-200 m-0">
                 Action Required: {pendingLeavesCount} Pending Leave Request{pendingLeavesCount > 1 ? 's' : ''}
               </h4>
-              <p className="text-xs text-amber-800 mt-0.5">
+              <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5">
                 Staff members have submitted leave requests waiting for manager review and approval.
               </p>
             </div>
