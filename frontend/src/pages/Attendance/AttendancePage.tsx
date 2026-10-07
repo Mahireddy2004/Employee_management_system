@@ -27,6 +27,7 @@ import type {
 import type { Employee } from '../../types/employee';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
+import { useToast } from '../../context/ToastContext';
 
 /**
  * Formats date strings (e.g. "2026-09-20T00:00:00" or "2026-09-20")
@@ -118,6 +119,7 @@ export const AttendancePage: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null
   );
+  const toast = useToast();
 
   // Filter states
   const [filterDate, setFilterDate] = useState<string>('');
@@ -303,10 +305,12 @@ export const AttendancePage: React.FC = () => {
         };
 
         await attendanceApi.update(editingRecord.id, payload);
+        const successMsg = `Attendance entry updated for ${editingRecord.employeeName || 'employee'} on ${formatDateDisplay(formData.date)}.`;
         setFeedback({
           type: 'success',
-          message: `Attendance entry updated for ${editingRecord.employeeName || 'employee'} on ${formatDateDisplay(formData.date)}.`,
+          message: successMsg,
         });
+        toast.success(successMsg);
       } else {
         // Create mode: POST /api/attendance
         const payload: CreateAttendanceRequest = {
@@ -325,10 +329,12 @@ export const AttendancePage: React.FC = () => {
           ? `${selectedEmp.firstName} ${selectedEmp.lastName}`
           : `Employee #${payload.employeeId}`;
 
+        const successMsg = `Attendance logged successfully for ${empName} on ${formatDateDisplay(formData.date)}.`;
         setFeedback({
           type: 'success',
-          message: `Attendance logged successfully for ${empName} on ${formatDateDisplay(formData.date)}.`,
+          message: successMsg,
         });
+        toast.success(successMsg);
       }
 
       setIsModalOpen(false);
@@ -350,6 +356,7 @@ export const AttendancePage: React.FC = () => {
       }
 
       setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsSaving(false);
     }
@@ -362,10 +369,12 @@ export const AttendancePage: React.FC = () => {
     setIsDeleting(true);
     try {
       await attendanceApi.delete(deleteTarget.id);
+      const successMsg = `Attendance record for ${deleteTarget.employeeName || 'employee'} on ${formatDateDisplay(deleteTarget.date)} deleted successfully.`;
       setFeedback({
         type: 'success',
-        message: `Attendance record for ${deleteTarget.employeeName || 'employee'} on ${formatDateDisplay(deleteTarget.date)} deleted successfully.`,
+        message: successMsg,
       });
+      toast.success(successMsg);
       setDeleteTarget(null);
       loadAttendance();
     } catch (err: unknown) {
@@ -382,6 +391,7 @@ export const AttendancePage: React.FC = () => {
       }
 
       setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
       setDeleteTarget(null);
     } finally {
       setIsDeleting(false);

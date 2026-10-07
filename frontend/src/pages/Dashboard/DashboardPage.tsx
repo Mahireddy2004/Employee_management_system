@@ -35,6 +35,7 @@ import type { DashboardSummary } from '../../types/dashboard';
 import type { Department } from '../../types/department';
 import { Loading } from '../../components/Loading/Loading';
 import { Button } from '../../components/common/Button';
+import { QuickClockWidget } from '../../components/Attendance/QuickClockWidget';
 
 // Palette for department distribution pie chart
 const PIE_COLORS = [
@@ -199,6 +200,9 @@ export const DashboardPage: React.FC = () => {
           </Button>
         </div>
       )}
+
+      {/* Quick Clock-In / Clock-Out Widget */}
+      <QuickClockWidget onAttendanceChanged={() => fetchDashboardData(true)} />
 
       {/* Primary KPI Cards Grid (4 Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">

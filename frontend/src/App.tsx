@@ -2,9 +2,11 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';
 import { Loading } from './components/Loading/Loading';
+import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
 
 // Code-split route components for optimal initial bundle performance
 const LoginPage = lazy(() => import('./pages/Login/LoginPage'));
@@ -61,13 +63,17 @@ export const AppRoutes: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </ToastProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <ErrorBoundary>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </ErrorBoundary>
+        </ToastProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

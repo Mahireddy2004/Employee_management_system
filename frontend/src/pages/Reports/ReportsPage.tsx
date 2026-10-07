@@ -4,6 +4,7 @@ import {
   Building2,
   CalendarCheck,
   CheckCircle2,
+  Download,
   FileSpreadsheet,
   FileText,
   IndianRupee,
@@ -13,9 +14,10 @@ import {
 } from 'lucide-react';
 import { reportApi } from '../../api/reportApi';
 import { Button } from '../../components/common/Button';
+import { useToast } from '../../context/ToastContext';
 
 type ReportCategory = 'employees' | 'attendance' | 'payroll';
-type ReportFormat = 'excel' | 'pdf';
+type ReportFormat = 'excel' | 'pdf' | 'csv';
 
 interface ReportCardConfig {
   id: ReportCategory;
@@ -83,6 +85,7 @@ const REPORT_CARDS: ReportCardConfig[] = [
 ];
 
 export const ReportsPage: React.FC = () => {
+  const toast = useToast();
   // Set of actively downloading report keys, e.g. "employees-excel"
   const [activeDownloads, setActiveDownloads] = useState<Set<string>>(new Set());
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -104,12 +107,15 @@ export const ReportsPage: React.FC = () => {
     // Mark only this specific button as downloading
     setActiveDownloads((prev) => new Set(prev).add(downloadKey));
     setFeedback(null);
+    toast.info(`Generating ${reportTitle} (${format.toUpperCase()})...`, 2500);
 
     try {
       const result =
         format === 'excel'
           ? await reportApi.exportExcel(category)
-          : await reportApi.exportPdf(category);
+          : format === 'pdf'
+          ? await reportApi.exportPdf(category)
+          : await reportApi.exportCsv(category);
 
       const { data: blob, filename } = result;
 
@@ -127,11 +133,13 @@ export const ReportsPage: React.FC = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
 
-      const formatLabel = format === 'excel' ? 'Excel' : 'PDF';
+      const formatLabel = format === 'excel' ? 'Excel' : format === 'pdf' ? 'PDF' : 'CSV';
+      const successMessage = `${reportTitle} ${formatLabel} report downloaded successfully.`;
       setFeedback({
         type: 'success',
-        message: `${reportTitle} ${formatLabel} report downloaded successfully.`,
+        message: successMessage,
       });
+      toast.success(successMessage);
     } catch (err: unknown) {
       console.error(`Failed to export ${category} report:`, err);
       let errorMsg = `Unable to generate ${reportTitle} (${format.toUpperCase()}). Please try again.`;
@@ -162,6 +170,7 @@ export const ReportsPage: React.FC = () => {
         type: 'error',
         message: errorMsg,
       });
+      toast.error(errorMsg);
     } finally {
       // Remove loading indicator for this specific action
       setActiveDownloads((prev) => {
@@ -226,6 +235,7 @@ export const ReportsPage: React.FC = () => {
           const Icon = report.icon;
           const isExcelLoading = activeDownloads.has(`${report.id}-excel`);
           const isPdfLoading = activeDownloads.has(`${report.id}-pdf`);
+          const isCsvLoading = activeDownloads.has(`${report.id}-csv`);
 
           return (
             <div
@@ -268,38 +278,56 @@ export const ReportsPage: React.FC = () => {
 
               {/* Action Buttons Footer */}
               <div className="p-6 pt-0 mt-2">
-                <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-2.5">
-                  {/* Download Excel Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full flex items-center justify-center space-x-2 py-2 hover:bg-emerald-50/50 hover:border-emerald-300 text-slate-700"
-                    isLoading={isExcelLoading}
-                    disabled={isExcelLoading}
-                    onClick={() => handleDownload(report.id, 'excel', report.title)}
-                    aria-label={`Download ${report.title} in Excel format`}
-                  >
-                    {!isExcelLoading && (
-                      <FileSpreadsheet className="w-4 h-4 text-emerald-600 shrink-0" />
-                    )}
-                    <span className="font-semibold text-xs">
-                      {isExcelLoading ? 'Generating...' : 'Download Excel'}
-                    </span>
-                  </Button>
+                <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
+                  <div className="flex flex-col sm:flex-row items-center gap-2">
+                    {/* Download Excel Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full flex items-center justify-center space-x-2 py-2 hover:bg-emerald-50/50 hover:border-emerald-300 text-slate-700"
+                      isLoading={isExcelLoading}
+                      disabled={isExcelLoading || isPdfLoading || isCsvLoading}
+                      onClick={() => handleDownload(report.id, 'excel', report.title)}
+                      aria-label={`Download ${report.title} in Excel format`}
+                    >
+                      {!isExcelLoading && (
+                        <FileSpreadsheet className="w-4 h-4 text-emerald-600 shrink-0" />
+                      )}
+                      <span className="font-semibold text-xs">
+                        {isExcelLoading ? 'Generating...' : 'Excel'}
+                      </span>
+                    </Button>
 
-                  {/* Download PDF Button */}
+                    {/* Download PDF Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full flex items-center justify-center space-x-2 py-2 hover:bg-rose-50/50 hover:border-rose-300 text-slate-700"
+                      isLoading={isPdfLoading}
+                      disabled={isExcelLoading || isPdfLoading || isCsvLoading}
+                      onClick={() => handleDownload(report.id, 'pdf', report.title)}
+                      aria-label={`Download ${report.title} in PDF format`}
+                    >
+                      {!isPdfLoading && <FileText className="w-4 h-4 text-rose-600 shrink-0" />}
+                      <span className="font-semibold text-xs">
+                        {isPdfLoading ? 'Generating...' : 'PDF'}
+                      </span>
+                    </Button>
+                  </div>
+
+                  {/* Download CSV Button */}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full flex items-center justify-center space-x-2 py-2 hover:bg-rose-50/50 hover:border-rose-300 text-slate-700"
-                    isLoading={isPdfLoading}
-                    disabled={isPdfLoading}
-                    onClick={() => handleDownload(report.id, 'pdf', report.title)}
-                    aria-label={`Download ${report.title} in PDF format`}
+                    className="w-full flex items-center justify-center space-x-2 py-2 hover:bg-blue-50/50 hover:border-blue-300 text-slate-700"
+                    isLoading={isCsvLoading}
+                    disabled={isExcelLoading || isPdfLoading || isCsvLoading}
+                    onClick={() => handleDownload(report.id, 'csv', report.title)}
+                    aria-label={`Download ${report.title} in CSV format`}
                   >
-                    {!isPdfLoading && <FileText className="w-4 h-4 text-rose-600 shrink-0" />}
+                    {!isCsvLoading && <Download className="w-4 h-4 text-blue-600 shrink-0" />}
                     <span className="font-semibold text-xs">
-                      {isPdfLoading ? 'Generating...' : 'Download PDF'}
+                      {isCsvLoading ? 'Generating...' : 'Download CSV (.csv)'}
                     </span>
                   </Button>
                 </div>

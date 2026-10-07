@@ -59,4 +59,26 @@ public class ReportsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    /// <summary>
+    /// GET /api/reports/export/csv?type=employees|attendance|payroll
+    /// Generates and returns a standard RFC 4180 CSV spreadsheet (.csv).
+    /// </summary>
+    [HttpGet("export/csv")]
+    public async Task<IActionResult> ExportCsv([FromQuery] string type = "employees")
+    {
+        try
+        {
+            var bytes = await _reportService.GenerateCsvReportAsync(type);
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmm");
+            var filename = $"{type.ToLowerInvariant()}_report_{timestamp}.csv";
+            const string contentType = "text/csv; charset=utf-8";
+
+            return File(bytes, contentType, filename);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using ClosedXML.Excel;
 using EmployeeManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,17 @@ public class ReportService : IReportService
             "employees" => await GenerateEmployeesPdfAsync(),
             "attendance" => await GenerateAttendancePdfAsync(),
             "payroll" => await GeneratePayrollPdfAsync(),
+            _ => throw new ArgumentException($"Invalid report type '{reportType}'. Supported types are: 'employees', 'attendance', 'payroll'.", nameof(reportType))
+        };
+    }
+
+    public async Task<byte[]> GenerateCsvReportAsync(string reportType)
+    {
+        return reportType.Trim().ToLowerInvariant() switch
+        {
+            "employees" => await GenerateEmployeesCsvAsync(),
+            "attendance" => await GenerateAttendanceCsvAsync(),
+            "payroll" => await GeneratePayrollCsvAsync(),
             _ => throw new ArgumentException($"Invalid report type '{reportType}'. Supported types are: 'employees', 'attendance', 'payroll'.", nameof(reportType))
         };
     }
@@ -559,6 +571,117 @@ public class ReportService : IReportService
                  .BorderColor(Colors.Grey.Lighten2)
                  .PaddingVertical(4)
                  .PaddingHorizontal(4);
+
+    #endregion
+
+    #region CSV Generators
+
+    private static string EscapeCsv(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return "";
+        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n") || value.Contains("\r"))
+        {
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
+        return value;
+    }
+
+    private async Task<byte[]> GenerateEmployeesCsvAsync()
+    {
+        var employees = await _context.Employees
+            .Include(e => e.Department)
+            .AsNoTracking()
+            .OrderBy(e => e.Id)
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("ID,First Name,Last Name,Email,Phone,Department,Hire Date,Salary ($),Status");
+
+        foreach (var emp in employees)
+        {
+            sb.AppendLine(string.Join(",",
+                emp.Id,
+                EscapeCsv(emp.FirstName),
+                EscapeCsv(emp.LastName),
+                EscapeCsv(emp.Email),
+                EscapeCsv(emp.Phone),
+                EscapeCsv(emp.Department?.Name ?? "Unassigned"),
+                emp.HireDate.ToString("yyyy-MM-dd"),
+                emp.Salary.ToString("F2"),
+                EscapeCsv(emp.Status)
+            ));
+        }
+
+        return Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+    }
+
+    private async Task<byte[]> GenerateAttendanceCsvAsync()
+    {
+        var records = await _context.Attendance
+            .Include(a => a.Employee)
+            .ThenInclude(e => e!.Department)
+            .AsNoTracking()
+            .OrderByDescending(a => a.Date)
+            .ThenBy(a => a.EmployeeId)
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Log ID,Employee ID,Employee Name,Department,Date,Status,Check-In,Check-Out");
+
+        foreach (var r in records)
+        {
+            var empName = r.Employee != null ? $"{r.Employee.FirstName} {r.Employee.LastName}".Trim() : "Unknown";
+            var dept = r.Employee?.Department?.Name ?? "Unassigned";
+            var checkIn = r.CheckInTime.HasValue ? r.CheckInTime.Value.ToString(@"hh\:mm") : "—";
+            var checkOut = r.CheckOutTime.HasValue ? r.CheckOutTime.Value.ToString(@"hh\:mm") : "—";
+
+            sb.AppendLine(string.Join(",",
+                r.Id,
+                r.EmployeeId,
+                EscapeCsv(empName),
+                EscapeCsv(dept),
+                r.Date.ToString("yyyy-MM-dd"),
+                EscapeCsv(r.Status),
+                EscapeCsv(checkIn),
+                EscapeCsv(checkOut)
+            ));
+        }
+
+        return Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+    }
+
+    private async Task<byte[]> GeneratePayrollCsvAsync()
+    {
+        var employees = await _context.Employees
+            .Include(e => e.Department)
+            .AsNoTracking()
+            .OrderBy(e => e.Id)
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Employee ID,Full Name,Department,Annual Salary ($),Monthly Gross ($),Estimated Tax (15%) ($),Net Monthly Pay ($),Status");
+
+        foreach (var emp in employees)
+        {
+            var monthlyGross = emp.Salary / 12m;
+            var tax = monthlyGross * 0.15m;
+            var netPay = monthlyGross - tax;
+            var fullName = $"{emp.FirstName} {emp.LastName}".Trim();
+
+            sb.AppendLine(string.Join(",",
+                emp.Id,
+                EscapeCsv(fullName),
+                EscapeCsv(emp.Department?.Name ?? "Unassigned"),
+                emp.Salary.ToString("F2"),
+                monthlyGross.ToString("F2"),
+                tax.ToString("F2"),
+                netPay.ToString("F2"),
+                EscapeCsv(emp.Status)
+            ));
+        }
+
+        return Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+    }
 
     #endregion
 }
