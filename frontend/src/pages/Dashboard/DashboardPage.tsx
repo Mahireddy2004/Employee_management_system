@@ -8,6 +8,7 @@ import {
   Building2,
   Calendar,
   CalendarCheck,
+  CalendarPlus,
   CheckCircle2,
   IndianRupee,
   MapPin,
@@ -252,11 +253,14 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Link to="/leaves">
-                <Button className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 font-semibold shadow-md">
-                  <CalendarCheck className="w-4 h-4 mr-2 text-emerald-600" />
-                  Apply for Leave
-                </Button>
+              <Link to="/leaves?action=apply">
+                <button
+                  type="button"
+                  className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-sm shadow-xl flex items-center justify-center space-x-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/30"
+                >
+                  <CalendarPlus className="w-5 h-5 text-emerald-700 stroke-[2.5]" />
+                  <span>+ Apply for Leave</span>
+                </button>
               </Link>
               <Button
                 variant="outline"
@@ -404,69 +408,97 @@ export const DashboardPage: React.FC = () => {
                 Track your allocated balances and remaining days for the current calendar year.
               </p>
             </div>
-            <Link to="/leaves">
-              <Button size="sm" variant="outline" className="text-xs">
-                Request Leave
-              </Button>
+            <Link to="/leaves?action=apply">
+              <button
+                type="button"
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer ring-2 ring-emerald-400/30"
+              >
+                <CalendarPlus className="w-3.5 h-3.5" />
+                <span>+ Apply for Leave</span>
+              </button>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span>Casual Leave</span>
-                <span className="font-bold text-slate-700">Quota: 12 days</span>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                  <span>Casual Leave</span>
+                  <span className="font-bold text-slate-700">Quota: 12 days</span>
+                </div>
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {myLeaveSummary?.casualLeaveBalance ?? 12}
+                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                  <div
+                    className="bg-indigo-600 h-2 rounded-full"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.casualLeaveBalance ?? 12) / 12) * 100))}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">
-                {myLeaveSummary?.casualLeaveBalance ?? 12}
-                <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
-                <div
-                  className="bg-indigo-600 h-2 rounded-full"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.casualLeaveBalance ?? 12) / 12) * 100))}%`,
-                  }}
-                />
-              </div>
+              <Link
+                to="/leaves?action=apply&type=Casual"
+                className="block mt-3 text-center text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 py-1.5 rounded-lg border border-indigo-200 transition-colors"
+              >
+                + Apply Casual Leave
+              </Link>
             </div>
 
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span>Sick Leave</span>
-                <span className="font-bold text-slate-700">Quota: 10 days</span>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                  <span>Sick Leave</span>
+                  <span className="font-bold text-slate-700">Quota: 10 days</span>
+                </div>
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {myLeaveSummary?.sickLeaveBalance ?? 10}
+                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                  <div
+                    className="bg-emerald-600 h-2 rounded-full"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.sickLeaveBalance ?? 10) / 10) * 100))}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">
-                {myLeaveSummary?.sickLeaveBalance ?? 10}
-                <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
-                <div
-                  className="bg-emerald-600 h-2 rounded-full"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.sickLeaveBalance ?? 10) / 10) * 100))}%`,
-                  }}
-                />
-              </div>
+              <Link
+                to="/leaves?action=apply&type=Sick"
+                className="block mt-3 text-center text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 py-1.5 rounded-lg border border-emerald-200 transition-colors"
+              >
+                + Apply Sick Leave
+              </Link>
             </div>
 
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span>Annual Leave</span>
-                <span className="font-bold text-slate-700">Quota: 15 days</span>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                  <span>Annual Leave</span>
+                  <span className="font-bold text-slate-700">Quota: 15 days</span>
+                </div>
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {myLeaveSummary?.annualLeaveBalance ?? 15}
+                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                  <div
+                    className="bg-amber-500 h-2 rounded-full"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.annualLeaveBalance ?? 15) / 15) * 100))}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">
-                {myLeaveSummary?.annualLeaveBalance ?? 15}
-                <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
-                <div
-                  className="bg-amber-500 h-2 rounded-full"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, ((myLeaveSummary?.annualLeaveBalance ?? 15) / 15) * 100))}%`,
-                  }}
-                />
-              </div>
+              <Link
+                to="/leaves?action=apply&type=Annual"
+                className="block mt-3 text-center text-xs font-bold text-amber-800 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 py-1.5 rounded-lg border border-amber-200 transition-colors"
+              >
+                + Apply Vacation Leave
+              </Link>
             </div>
           </div>
         </div>
@@ -607,6 +639,15 @@ export const DashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3">
+          <Link to="/leaves?action=apply">
+            <button
+              type="button"
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer ring-2 ring-emerald-400/30"
+            >
+              <CalendarPlus className="w-3.5 h-3.5" />
+              <span>Apply for Leave</span>
+            </button>
+          </Link>
           <Button
             variant="outline"
             size="sm"

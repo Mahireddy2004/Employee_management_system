@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Calendar,
   CalendarCheck2,
   CalendarDays,
+  CalendarPlus,
   CheckCircle2,
   Clock,
   Plus,
@@ -74,6 +76,19 @@ export const LeavesPage: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-open modal if directed with ?action=apply
+  useEffect(() => {
+    if (searchParams.get('action') === 'apply') {
+      const type = searchParams.get('type') || 'Casual';
+      setApplyForm((prev) => ({ ...prev, leaveType: type }));
+      setIsApplyModalOpen(true);
+      searchParams.delete('action');
+      searchParams.delete('type');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Modal: Apply Leave (Employee)
   const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
@@ -256,14 +271,57 @@ export const LeavesPage: React.FC = () => {
             <span>Refresh</span>
           </Button>
 
-          {/* Employee Apply Button */}
-          <Button
-            onClick={() => setIsApplyModalOpen(true)}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+          {/* High-Visibility Header Apply Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
+              setIsApplyModalOpen(true);
+            }}
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer ring-2 ring-emerald-400/40"
           >
-            <Plus className="w-4 h-4" />
+            <CalendarPlus className="w-4 h-4" />
             <span>Apply for Leave</span>
-          </Button>
+          </button>
+        </div>
+      </div>
+
+      {/* Prominent Hero Action Card for "Apply for Leave" */}
+      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-indigo-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden border border-emerald-400/30">
+        <div className="absolute right-0 top-0 -mt-6 -mr-6 w-56 h-56 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="flex items-start space-x-4">
+            <div className="p-3.5 bg-white/20 rounded-2xl border border-white/30 shadow-inner shrink-0 text-white">
+              <CalendarPlus className="w-8 h-8" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2.5">
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white m-0">
+                  Apply for Leave / Time Off
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white text-emerald-800 shadow-xs">
+                  Request Time Off
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-emerald-50 mt-1.5 max-w-2xl leading-relaxed">
+                Need days off for illness, personal emergency, or vacation? Submit your request here. Your manager will be notified immediately for approval.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
+                setIsApplyModalOpen(true);
+              }}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-sm sm:text-base shadow-2xl flex items-center justify-center space-x-2.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/40"
+            >
+              <Plus className="w-5 h-5 text-emerald-700 stroke-[3]" />
+              <span>+ Apply for Leave Now</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -338,55 +396,94 @@ export const LeavesPage: React.FC = () => {
       ) : (
         /* Employee Personal Leave Balance Overview */
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Casual Leaves Available
-              </span>
-              <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
-                <CalendarCheck2 className="w-5 h-5" />
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Casual Leaves Available
+                </span>
+                <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
+                  <CalendarCheck2 className="w-5 h-5" />
+                </div>
               </div>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
+                {summary?.casualLeaveBalance ?? 12} <span className="text-sm font-normal text-slate-400">/ 12 Days</span>
+              </h3>
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
+                Personal & emergency allowance
+              </p>
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
-              {summary?.casualLeaveBalance ?? 12} <span className="text-sm font-normal text-slate-400">/ 12 Days</span>
-            </h3>
-            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
-              Personal & emergency allowance
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
+                setIsApplyModalOpen(true);
+              }}
+              className="mt-4 w-full py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-200 dark:border-blue-800 flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Apply Casual Leave</span>
+            </button>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Sick Leaves Available
-              </span>
-              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl">
-                <ShieldAlert className="w-5 h-5" />
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Sick Leaves Available
+                </span>
+                <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
               </div>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
+                {summary?.sickLeaveBalance ?? 10} <span className="text-sm font-normal text-slate-400">/ 10 Days</span>
+              </h3>
+              <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mt-1">
+                Medical recuperation
+              </p>
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
-              {summary?.sickLeaveBalance ?? 10} <span className="text-sm font-normal text-slate-400">/ 10 Days</span>
-            </h3>
-            <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mt-1">
-              Medical recuperation
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setApplyForm({ leaveType: 'Sick', startDate: '', endDate: '', reason: '' });
+                setIsApplyModalOpen(true);
+              }}
+              className="mt-4 w-full py-2 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-800 flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Apply Sick Leave</span>
+            </button>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Annual Vacation Days
-              </span>
-              <div className="p-2.5 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl">
-                <Calendar className="w-5 h-5" />
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Annual Vacation Days
+                </span>
+                <div className="p-2.5 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl">
+                  <Calendar className="w-5 h-5" />
+                </div>
               </div>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
+                {summary?.annualLeaveBalance ?? 15} <span className="text-sm font-normal text-slate-400">/ 15 Days</span>
+              </h3>
+              <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-1">
+                Paid annual vacation
+              </p>
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2">
-              {summary?.annualLeaveBalance ?? 15} <span className="text-sm font-normal text-slate-400">/ 15 Days</span>
-            </h3>
-            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-1">
-              Paid annual vacation
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setApplyForm({ leaveType: 'Annual', startDate: '', endDate: '', reason: '' });
+                setIsApplyModalOpen(true);
+              }}
+              className="mt-4 w-full py-2 px-3 rounded-xl bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 font-bold text-xs border border-purple-200 dark:border-purple-800 flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Apply Vacation Leave</span>
+            </button>
           </div>
         </div>
       )}
