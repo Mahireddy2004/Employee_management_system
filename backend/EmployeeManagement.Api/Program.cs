@@ -184,8 +184,38 @@ app.UseAuthorization();
 // Route incoming HTTP requests to controllers
 app.MapControllers();
 
-// Health check endpoint for cloud monitoring and container probes
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+// Readiness check for cloud monitoring, container probes, and local launch scripts
+app.MapGet("/health", async (AppDbContext context, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        if (!await context.Database.CanConnectAsync(cancellationToken))
+        {
+            return Results.Json(
+                new { status = "unhealthy", reason = "Cannot connect to database. Verify MySQL is running and credentials are valid." },
+                statusCode: StatusCodes.Status503ServiceUnavailable
+            );
+        }
+
+        var pendingMigrations = (await context.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
+        if (pendingMigrations.Count > 0)
+        {
+            return Results.Json(
+                new { status = "unhealthy", reason = "Pending database migrations exist.", pendingMigrations },
+                statusCode: StatusCodes.Status503ServiceUnavailable
+            );
+        }
+
+        return Results.Ok(new { status = "healthy", database = "connected" });
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(
+            new { status = "unhealthy", reason = ex.Message },
+            statusCode: StatusCodes.Status503ServiceUnavailable
+        );
+    }
+})
    .WithName("HealthCheck")
    .WithTags("Health")
    .AllowAnonymous();
