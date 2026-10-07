@@ -33,6 +33,7 @@ import type {
 import type { Department } from '../../types/department';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
+import { useToast } from '../../context/ToastContext';
 
 /**
  * Formats numerical salary amounts in Indian Rupee (INR) format.
@@ -269,6 +270,7 @@ const parseAndValidateCSV = (
 };
 
 export const EmployeesPage: React.FC = () => {
+  const toast = useToast();
   // Directory & pagination state
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -542,10 +544,7 @@ export const EmployeesPage: React.FC = () => {
           status: formData.status,
         };
         await employeeApi.update(employeeToEdit.id, payload);
-        setFeedback({
-          type: 'success',
-          message: `Employee "${formData.firstName} ${formData.lastName}" updated successfully.`,
-        });
+        toast.success(`Employee "${formData.firstName} ${formData.lastName}" updated successfully.`);
       } else {
         // Create mode: POST /api/employees
         const payload: CreateEmployeeRequest = {
@@ -559,10 +558,7 @@ export const EmployeesPage: React.FC = () => {
           status: formData.status,
         };
         await employeeApi.create(payload);
-        setFeedback({
-          type: 'success',
-          message: `Employee "${formData.firstName} ${formData.lastName}" added successfully.`,
-        });
+        toast.success(`Employee "${formData.firstName} ${formData.lastName}" added successfully.`);
       }
 
       setIsModalOpen(false);
@@ -578,7 +574,7 @@ export const EmployeesPage: React.FC = () => {
           errorMsg = 'An employee with this email address already exists.';
         }
       }
-      setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsSaving(false);
     }
@@ -596,10 +592,7 @@ export const EmployeesPage: React.FC = () => {
         next.delete(deleteTarget.id);
         return next;
       });
-      setFeedback({
-        type: 'success',
-        message: `Employee "${deleteTarget.fullName}" deleted successfully.`,
-      });
+      toast.success(`Employee "${deleteTarget.fullName}" deleted successfully.`);
       setDeleteTarget(null);
 
       // If last item on page deleted, shift back a page if possible
@@ -617,7 +610,7 @@ export const EmployeesPage: React.FC = () => {
           errorMsg = axiosErr.response.data.message;
         }
       }
-      setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsDeleting(false);
     }
@@ -634,15 +627,9 @@ export const EmployeesPage: React.FC = () => {
       const res = await employeeApi.bulkDelete({ employeeIds: idsToDelete });
 
       if (res.failureCount === 0) {
-        setFeedback({
-          type: 'success',
-          message: `Successfully deleted all ${res.successCount} selected employee(s).`,
-        });
+        toast.success(`Successfully deleted all ${res.successCount} selected employee(s).`);
       } else {
-        setFeedback({
-          type: 'error',
-          message: `Deleted ${res.successCount} employee(s). ${res.failureCount} failed: ${res.errors.join('; ')}`,
-        });
+        toast.error(`Deleted ${res.successCount} employee(s). ${res.failureCount} failed: ${res.errors.join('; ')}`);
       }
 
       setIsBulkDeleteModalOpen(false);

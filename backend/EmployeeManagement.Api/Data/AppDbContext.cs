@@ -59,6 +59,10 @@ public class AppDbContext : DbContext
             entity.Property(e => e.HireDate).IsRequired();
             entity.Property(e => e.Salary).HasPrecision(18, 2);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+
+            // Global Query Filter: Exclude soft-deleted employees automatically
+            entity.HasQueryFilter(e => !e.IsDeleted);
 
             // Index: Employee Email (Unique)
             entity.HasIndex(e => e.Email)
@@ -68,6 +72,10 @@ public class AppDbContext : DbContext
             // Index: Employee DepartmentId
             entity.HasIndex(e => e.DepartmentId)
                   .HasDatabaseName("IX_Employees_DepartmentId");
+
+            // Index: Employee IsDeleted
+            entity.HasIndex(e => e.IsDeleted)
+                  .HasDatabaseName("IX_Employees_IsDeleted");
 
             // Relationship: Employee 1 -> Many Attendance records
             entity.HasMany(e => e.Attendances)
@@ -90,6 +98,50 @@ public class AppDbContext : DbContext
             // Index: Attendance Date
             entity.HasIndex(a => a.Date)
                   .HasDatabaseName("IX_Attendance_Date");
+
+            // Composite Unique Index: Prevent duplicate attendance records for the same employee on the same date
+            entity.HasIndex(a => new { a.EmployeeId, a.Date })
+                  .IsUnique()
+                  .HasDatabaseName("IX_Attendance_EmployeeId_Date");
+
+            // Global Query Filter: Automatically filter attendance of soft-deleted employees
+            entity.HasQueryFilter(a => !a.Employee!.IsDeleted);
         });
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateAuditTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        UpdateAuditTimestamps();
+        return base.SaveChanges();
+    }
+
+    private void UpdateAuditTimestamps()
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.Entity is Employee && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            if (entry.Entity is Employee emp)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    if (emp.CreatedAt == default)
+                    {
+                        emp.CreatedAt = DateTime.UtcNow;
+                    }
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    emp.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+        }
     }
 }

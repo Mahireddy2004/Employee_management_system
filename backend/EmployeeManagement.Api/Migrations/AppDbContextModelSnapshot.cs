@@ -55,6 +55,10 @@ namespace EmployeeManagement.Api.Migrations
                     b.HasIndex("EmployeeId")
                         .HasDatabaseName("IX_Attendance_EmployeeId");
 
+                    b.HasIndex("EmployeeId", "Date")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Attendance_EmployeeId_Date");
+
                     b.ToTable("Attendance");
                 });
 
@@ -92,6 +96,9 @@ namespace EmployeeManagement.Api.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
@@ -107,6 +114,11 @@ namespace EmployeeManagement.Api.Migrations
 
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -126,6 +138,9 @@ namespace EmployeeManagement.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId")
@@ -134,6 +149,9 @@ namespace EmployeeManagement.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("IX_Employees_Email");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Employees_IsDeleted");
 
                     b.ToTable("Employees");
                 });

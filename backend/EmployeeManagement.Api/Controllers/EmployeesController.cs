@@ -222,7 +222,10 @@ public class EmployeesController : ControllerBase
             return NotFound(new { message = $"Employee with ID {id} was not found." });
         }
 
-        _context.Employees.Remove(employee);
+        // Soft delete: preserve employee record and attendance history
+        employee.IsDeleted = true;
+        employee.Status = EmployeeStatus.Terminated;
+        employee.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -342,7 +345,13 @@ public class EmployeesController : ControllerBase
 
         if (employeesToDelete.Count > 0)
         {
-            _context.Employees.RemoveRange(employeesToDelete);
+            // Soft delete batch
+            foreach (var emp in employeesToDelete)
+            {
+                emp.IsDeleted = true;
+                emp.Status = EmployeeStatus.Terminated;
+                emp.UpdatedAt = DateTime.UtcNow;
+            }
             await _context.SaveChangesAsync();
             result.SuccessCount = employeesToDelete.Count;
         }
@@ -361,6 +370,7 @@ public class EmployeesController : ControllerBase
         Salary = e.Salary,
         DepartmentId = e.DepartmentId,
         DepartmentName = e.Department?.Name,
-        Status = e.Status
+        Status = e.Status,
+        CreatedAt = e.CreatedAt
     };
 }

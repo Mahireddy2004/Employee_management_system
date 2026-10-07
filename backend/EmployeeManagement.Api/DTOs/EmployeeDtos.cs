@@ -83,6 +83,7 @@ public class EmployeeResponseDto
     public int DepartmentId { get; set; }
     public string? DepartmentName { get; set; }
     public string Status { get; set; } = "Active";
+    public DateTime? CreatedAt { get; set; }
 }
 
 public class BulkCreateEmployeeDto

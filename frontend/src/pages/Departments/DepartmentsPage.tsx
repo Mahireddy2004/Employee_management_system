@@ -22,6 +22,7 @@ import type {
 } from '../../types/department';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
+import { useToast } from '../../context/ToastContext';
 
 /**
  * Formats numerical budget amounts into Indian Rupee (INR) format.
@@ -36,6 +37,7 @@ const formatINR = (value: number): string => {
 };
 
 export const DepartmentsPage: React.FC = () => {
+  const toast = useToast();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -163,10 +165,7 @@ export const DepartmentsPage: React.FC = () => {
           location: formData.location.trim(),
         };
         await departmentApi.update(departmentToEdit.id, payload);
-        setFeedback({
-          type: 'success',
-          message: `Department "${formData.name.trim()}" updated successfully.`,
-        });
+        toast.success(`Department "${formData.name.trim()}" updated successfully.`);
       } else {
         // Create mode: POST /api/departments
         const payload: CreateDepartmentRequest = {
@@ -175,10 +174,7 @@ export const DepartmentsPage: React.FC = () => {
           location: formData.location.trim(),
         };
         await departmentApi.create(payload);
-        setFeedback({
-          type: 'success',
-          message: `Department "${formData.name.trim()}" created successfully.`,
-        });
+        toast.success(`Department "${formData.name.trim()}" created successfully.`);
       }
 
       setIsModalOpen(false);
@@ -198,7 +194,7 @@ export const DepartmentsPage: React.FC = () => {
         }
       }
 
-      setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsSaving(false);
     }
@@ -211,10 +207,7 @@ export const DepartmentsPage: React.FC = () => {
     setIsDeleting(true);
     try {
       await departmentApi.delete(deleteTarget.id);
-      setFeedback({
-        type: 'success',
-        message: `Department "${deleteTarget.name}" deleted successfully.`,
-      });
+      toast.success(`Department "${deleteTarget.name}" deleted successfully.`);
       setDeleteTarget(null);
       loadDepartments();
     } catch (err: unknown) {
@@ -233,7 +226,7 @@ export const DepartmentsPage: React.FC = () => {
         }
       }
 
-      setFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
       setDeleteTarget(null);
     } finally {
       setIsDeleting(false);

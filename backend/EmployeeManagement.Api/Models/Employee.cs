@@ -45,6 +45,12 @@ public class Employee
     [MaxLength(20)]
     public string Status { get; set; } = EmployeeStatus.Active;
 
+    public bool IsDeleted { get; set; } = false;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime? UpdatedAt { get; set; }
+
     // Navigation property: Department
     [ForeignKey(nameof(DepartmentId))]
     public Department? Department { get; set; }

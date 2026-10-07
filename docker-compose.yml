@@ -1,0 +1,66 @@
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: ems-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPassword@123
+      MYSQL_DATABASE: employee_management
+    ports:
+      - "3306:3306"
+    volumes:
+      - ems_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRootPassword@123"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ems-network
+
+  # ASP.NET Core 8 Web API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ems-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=server=mysql;port=3306;database=employee_management;user=root;password=RootPassword@123
+      - Jwt__Key=DockerComposeSecureSecretKey2026_Minimum32BytesLong!
+      - Jwt__Issuer=EmployeeManagementApi
+      - Jwt__Audience=EmployeeManagementClient
+      - Database__ApplyMigrationsOnStartup=true
+      - Database__SeedDemoData=true
+      - Cors__AllowedOrigins__0=*
+    ports:
+      - "5000:8080"
+    networks:
+      - ems-network
+
+  # React + Vite Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ems-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - ems-network
+
+volumes:
+  ems_mysql_data:
+    driver: local
+
+networks:
+  ems-network:
+    driver: bridge
