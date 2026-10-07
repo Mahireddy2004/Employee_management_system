@@ -871,12 +871,14 @@ export const EmployeesPage: React.FC = () => {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 m-0">
-              Employee Directory
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-3.5">
+            <div className="flex items-center space-x-2.5">
+              <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 m-0">
+                Employee Directory
+              </h1>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               {totalCount} Total Staff
             </span>
           </div>

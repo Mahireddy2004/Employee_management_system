@@ -633,9 +633,9 @@ export const DashboardPage: React.FC = () => {
       {/* Header with Title and Refresh Trigger */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-3.5 sm:gap-4">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">Executive Dashboard</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               Manager Portal
             </span>
           </div>
@@ -703,11 +703,11 @@ export const DashboardPage: React.FC = () => {
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-3.5">
                 <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 m-0">
                   Today's Staff Clock-In Monitor
                 </h3>
-                <span className="flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Live Feed</span>
                 </span>

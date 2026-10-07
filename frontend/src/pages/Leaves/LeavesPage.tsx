@@ -237,12 +237,12 @@ export const LeavesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="flex items-center space-x-2.5">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-3.5">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">
               Leave Management
             </h1>
             <span
-              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${
                 isAdmin
                   ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
                   : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
@@ -298,11 +298,11 @@ export const LeavesPage: React.FC = () => {
                 <CalendarPlus className="w-8 h-8" />
               </div>
               <div>
-                <div className="flex items-center space-x-2.5">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-3.5">
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white m-0">
                     Apply for Leave / Time Off
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white text-emerald-800 shadow-xs">
+                  <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white text-emerald-800 shadow-xs">
                     Request Time Off
                   </span>
                 </div>
