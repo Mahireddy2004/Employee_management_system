@@ -19,6 +19,9 @@ public class Department
     [MaxLength(150)]
     public string? Location { get; set; }
 
+    [MaxLength(255)]
+    public string? Facilities { get; set; }
+
     // Navigation property: Department 1 -> many Employees
     [JsonIgnore]
     public ICollection<Employee> Employees { get; set; } = new List<Employee>();

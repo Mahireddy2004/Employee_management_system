@@ -21,7 +21,7 @@ public class DepartmentsController : ControllerBase
 
     /// <summary>
     /// GET /api/departments
-    /// Returns all departments including employee counts.
+    /// Returns all departments including employee counts and facilities.
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DepartmentResponseDto>>> GetAll()
@@ -34,6 +34,7 @@ public class DepartmentsController : ControllerBase
                 Name = d.Name,
                 Budget = d.Budget,
                 Location = d.Location,
+                Facilities = d.Facilities,
                 EmployeeCount = d.Employees.Count()
             })
             .OrderBy(d => d.Name)
@@ -44,7 +45,7 @@ public class DepartmentsController : ControllerBase
 
     /// <summary>
     /// GET /api/departments/{id}
-    /// Returns a specific department with its employee count.
+    /// Returns a specific department with its employee count and facilities.
     /// </summary>
     [HttpGet("{id:int}")]
     public async Task<ActionResult<DepartmentResponseDto>> GetById(int id)
@@ -58,6 +59,7 @@ public class DepartmentsController : ControllerBase
                 Name = d.Name,
                 Budget = d.Budget,
                 Location = d.Location,
+                Facilities = d.Facilities,
                 EmployeeCount = d.Employees.Count()
             })
             .FirstOrDefaultAsync();
@@ -94,7 +96,8 @@ public class DepartmentsController : ControllerBase
         {
             Name = dto.Name.Trim(),
             Budget = dto.Budget,
-            Location = dto.Location?.Trim()
+            Location = dto.Location?.Trim(),
+            Facilities = dto.Facilities?.Trim()
         };
 
         _context.Departments.Add(department);
@@ -106,6 +109,7 @@ public class DepartmentsController : ControllerBase
             Name = department.Name,
             Budget = department.Budget,
             Location = department.Location,
+            Facilities = department.Facilities,
             EmployeeCount = 0
         };
 
@@ -141,6 +145,7 @@ public class DepartmentsController : ControllerBase
         department.Name = dto.Name.Trim();
         department.Budget = dto.Budget;
         department.Location = dto.Location?.Trim();
+        department.Facilities = dto.Facilities?.Trim();
 
         await _context.SaveChangesAsync();
 
@@ -152,6 +157,7 @@ public class DepartmentsController : ControllerBase
             Name = department.Name,
             Budget = department.Budget,
             Location = department.Location,
+            Facilities = department.Facilities,
             EmployeeCount = employeeCount
         };
 

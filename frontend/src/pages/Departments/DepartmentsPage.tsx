@@ -1,25 +1,39 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
-  AlertTriangle,
+  ArrowRightLeft,
   Building2,
   CheckCircle2,
+  Code2,
   IndianRupee,
+  Kanban,
+  LayoutGrid,
+  Mail,
   MapPin,
+  Palette,
   Pencil,
+  Phone,
   Plus,
   RefreshCw,
   Search,
+  Server,
+  Sparkles,
   Trash2,
+  UserCheck,
+  UserPlus,
   Users,
+  Wrench,
   X,
 } from 'lucide-react';
 import { departmentApi } from '../../api/departmentApi';
+import { employeeApi } from '../../api/employeeApi';
 import type {
   CreateDepartmentRequest,
   Department,
   UpdateDepartmentRequest,
 } from '../../types/department';
+import type { Employee } from '../../types/employee';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
 import { useToast } from '../../context/ToastContext';
@@ -36,14 +50,150 @@ const formatINR = (value: number): string => {
   }).format(value);
 };
 
+/**
+ * Splits comma-separated facilities string into clean badge tokens.
+ */
+const parseFacilities = (facStr?: string): string[] => {
+  if (!facStr || !facStr.trim()) return [];
+  return facStr
+    .split(',')
+    .map((f) => f.trim())
+    .filter(Boolean);
+};
+
+/**
+ * Recommended quick-add facilities for software offices
+ */
+const SUGGESTED_FACILITIES = [
+  'Dual Monitors',
+  'Dev Cloud Sandbox',
+  'GitHub CI/CD',
+  'HRMS Portal',
+  'Biometric Access',
+  'QA Test Rig',
+  'Mobile Test Devices',
+  'Figma Enterprise',
+  'AWS/Azure Console',
+  'High-Speed LAN',
+  'Meeting Room',
+  'Workstation Rig',
+];
+
+/**
+ * Dynamic metadata and branding for software office divisions
+ */
+const getDepartmentMeta = (name: string) => {
+  const lower = name.toLowerCase();
+  if (
+    lower.includes('human') ||
+    lower.includes('hr') ||
+    lower.includes('people') ||
+    lower.includes('talent')
+  ) {
+    return {
+      icon: Users,
+      badgeColor: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+      headerBg: 'bg-rose-500/10 border-rose-200 dark:border-rose-800/60',
+      accentColor: 'text-rose-600 dark:text-rose-400',
+      bgIcon: 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300',
+      label: 'HR & People Operations',
+    };
+  }
+  if (
+    lower.includes('software') ||
+    lower.includes('dev') ||
+    lower.includes('tech') ||
+    lower.includes('engine')
+  ) {
+    return {
+      icon: Code2,
+      badgeColor: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+      headerBg: 'bg-indigo-500/10 border-indigo-200 dark:border-indigo-800/60',
+      accentColor: 'text-indigo-600 dark:text-indigo-400',
+      bgIcon: 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300',
+      label: 'Software Engineering & Dev',
+    };
+  }
+  if (
+    lower.includes('qa') ||
+    lower.includes('quality') ||
+    lower.includes('test')
+  ) {
+    return {
+      icon: CheckCircle2,
+      badgeColor: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+      headerBg: 'bg-emerald-500/10 border-emerald-200 dark:border-emerald-800/60',
+      accentColor: 'text-emerald-600 dark:text-emerald-400',
+      bgIcon: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300',
+      label: 'Quality Assurance & Testing',
+    };
+  }
+  if (
+    lower.includes('devops') ||
+    lower.includes('cloud') ||
+    lower.includes('infra') ||
+    lower.includes('server')
+  ) {
+    return {
+      icon: Server,
+      badgeColor: 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
+      headerBg: 'bg-cyan-500/10 border-cyan-200 dark:border-cyan-800/60',
+      accentColor: 'text-cyan-600 dark:text-cyan-400',
+      bgIcon: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-300',
+      label: 'Cloud & DevOps Infrastructure',
+    };
+  }
+  if (
+    lower.includes('design') ||
+    lower.includes('ui') ||
+    lower.includes('ux') ||
+    lower.includes('product')
+  ) {
+    return {
+      icon: Palette,
+      badgeColor: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      headerBg: 'bg-amber-500/10 border-amber-200 dark:border-amber-800/60',
+      accentColor: 'text-amber-600 dark:text-amber-400',
+      bgIcon: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300',
+      label: 'UI/UX & Product Design',
+    };
+  }
+  if (
+    lower.includes('it') ||
+    lower.includes('support') ||
+    lower.includes('facilit')
+  ) {
+    return {
+      icon: Wrench,
+      badgeColor: 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800',
+      headerBg: 'bg-teal-500/10 border-teal-200 dark:border-teal-800/60',
+      accentColor: 'text-teal-600 dark:text-teal-400',
+      bgIcon: 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-300',
+      label: 'IT Support & Office Facilities',
+    };
+  }
+  return {
+    icon: Building2,
+    badgeColor: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+    headerBg: 'bg-slate-500/10 border-slate-200 dark:border-slate-800/60',
+    accentColor: 'text-slate-600 dark:text-slate-400',
+    bgIcon: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
+    label: 'Office Division',
+  };
+};
+
 export const DepartmentsPage: React.FC = () => {
   const toast = useToast();
+  const navigate = useNavigate();
+
+  // Data states
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
+
+  // View state: 'board' (Team Kanban Board) vs 'grid' (Summary Cards)
+  const [viewMode, setViewMode] = useState<'board' | 'grid'>('board');
 
   // Client-side search state
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -56,10 +206,12 @@ export const DepartmentsPage: React.FC = () => {
     name: string;
     budget: string;
     location: string;
+    facilities: string;
   }>({
     name: '',
     budget: '',
     location: '',
+    facilities: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -67,25 +219,26 @@ export const DepartmentsPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  // Auto-dismiss feedback alert after 5 seconds
-  useEffect(() => {
-    if (feedback) {
-      const timer = setTimeout(() => setFeedback(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [feedback]);
+  // Employee Quick Reassign state
+  const [reassignEmployee, setReassignEmployee] = useState<Employee | null>(null);
+  const [targetDeptId, setTargetDeptId] = useState<number | ''>('');
+  const [isReassigning, setIsReassigning] = useState<boolean>(false);
 
-  // Fetch departments list from backend API
-  const loadDepartments = useCallback(async () => {
+  // Fetch departments and active employees list from backend API
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     setApiError(null);
     try {
-      const data = await departmentApi.getAll();
-      setDepartments(data);
+      const [deptData, empResult] = await Promise.all([
+        departmentApi.getAll(),
+        employeeApi.getAll({ pageSize: 100 }),
+      ]);
+      setDepartments(deptData);
+      setEmployees(empResult.items ?? []);
     } catch (err: unknown) {
-      console.error('Failed to load departments:', err);
+      console.error('Failed to load software office data:', err);
       setApiError(
-        'Unable to load departments. Please ensure the backend API server is running and authenticated.'
+        'Unable to load department and employee records. Please ensure the backend API server is running.'
       );
     } finally {
       setIsLoading(false);
@@ -93,8 +246,8 @@ export const DepartmentsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    loadDepartments();
-  }, [loadDepartments]);
+    loadData();
+  }, [loadData]);
 
   // Open Create Department modal
   const handleOpenCreateModal = () => {
@@ -103,6 +256,7 @@ export const DepartmentsPage: React.FC = () => {
       name: '',
       budget: '',
       location: '',
+      facilities: '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -115,9 +269,23 @@ export const DepartmentsPage: React.FC = () => {
       name: dept.name,
       budget: String(dept.budget),
       location: dept.location || '',
+      facilities: dept.facilities || '',
     });
     setFormErrors({});
     setIsModalOpen(true);
+  };
+
+  // Quick toggle suggested facility chip
+  const handleToggleSuggestedFacility = (facility: string) => {
+    const currentList = parseFacilities(formData.facilities);
+    const exists = currentList.some((f) => f.toLowerCase() === facility.toLowerCase());
+    let nextList: string[];
+    if (exists) {
+      nextList = currentList.filter((f) => f.toLowerCase() !== facility.toLowerCase());
+    } else {
+      nextList = [...currentList, facility];
+    }
+    setFormData({ ...formData, facilities: nextList.join(', ') });
   };
 
   // Validate form fields
@@ -136,9 +304,13 @@ export const DepartmentsPage: React.FC = () => {
     }
 
     if (!formData.location.trim()) {
-      errors.location = 'Location is required.';
+      errors.location = 'Location / floor bay is required.';
     } else if (formData.location.trim().length > 150) {
       errors.location = 'Location cannot exceed 150 characters.';
+    }
+
+    if (formData.facilities && formData.facilities.length > 255) {
+      errors.facilities = 'Facilities cannot exceed 255 characters.';
     }
 
     setFormErrors(errors);
@@ -163,6 +335,7 @@ export const DepartmentsPage: React.FC = () => {
           name: formData.name.trim(),
           budget: parsedBudget,
           location: formData.location.trim(),
+          facilities: formData.facilities.trim() || undefined,
         };
         await departmentApi.update(departmentToEdit.id, payload);
         toast.success(`Department "${formData.name.trim()}" updated successfully.`);
@@ -172,13 +345,14 @@ export const DepartmentsPage: React.FC = () => {
           name: formData.name.trim(),
           budget: parsedBudget,
           location: formData.location.trim(),
+          facilities: formData.facilities.trim() || undefined,
         };
         await departmentApi.create(payload);
         toast.success(`Department "${formData.name.trim()}" created successfully.`);
       }
 
       setIsModalOpen(false);
-      loadDepartments();
+      loadData();
     } catch (err: unknown) {
       console.error('Failed to save department:', err);
       let errorMsg = 'Failed to save department details. Please try again.';
@@ -209,7 +383,7 @@ export const DepartmentsPage: React.FC = () => {
       await departmentApi.delete(deleteTarget.id);
       toast.success(`Department "${deleteTarget.name}" deleted successfully.`);
       setDeleteTarget(null);
-      loadDepartments();
+      loadData();
     } catch (err: unknown) {
       console.error('Failed to delete department:', err);
       let errorMsg = 'Unable to delete department. Please try again.';
@@ -218,7 +392,6 @@ export const DepartmentsPage: React.FC = () => {
         const axiosErr = err as {
           response?: { status?: number; data?: { message?: string } };
         };
-        // Backend blocks deletion if employeeCount > 0 and responds with 400
         if (axiosErr.response?.status === 400 && deleteTarget.employeeCount > 0) {
           errorMsg = 'This department cannot be deleted because employees are currently assigned to it.';
         } else if (axiosErr.response?.data?.message) {
@@ -233,30 +406,100 @@ export const DepartmentsPage: React.FC = () => {
     }
   };
 
-  // Filter departments by client-side search query (Name or Location)
+  // Handle Quick Employee Department Reassignment
+  const handleConfirmReassign = async () => {
+    if (!reassignEmployee || !targetDeptId || isReassigning) return;
+
+    setIsReassigning(true);
+    try {
+      await employeeApi.update(reassignEmployee.id, {
+        firstName: reassignEmployee.firstName,
+        lastName: reassignEmployee.lastName,
+        email: reassignEmployee.email,
+        phone: reassignEmployee.phone,
+        hireDate: reassignEmployee.hireDate,
+        salary: reassignEmployee.salary,
+        departmentId: Number(targetDeptId),
+        status: reassignEmployee.status,
+      });
+
+      const targetDept = departments.find((d) => d.id === Number(targetDeptId));
+      toast.success(
+        `${reassignEmployee.fullName} moved to ${targetDept?.name || 'new department'} successfully.`
+      );
+      setReassignEmployee(null);
+      setTargetDeptId('');
+      loadData();
+    } catch (err: unknown) {
+      console.error('Failed to reassign employee:', err);
+      toast.error('Unable to reassign employee. Please try again.');
+    } finally {
+      setIsReassigning(false);
+    }
+  };
+
+  // Filter departments by client-side search query
   const filteredDepartments = departments.filter((dept) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.trim().toLowerCase();
     const nameMatch = dept.name.toLowerCase().includes(query);
     const locationMatch = dept.location ? dept.location.toLowerCase().includes(query) : false;
-    return nameMatch || locationMatch;
+    const facilitiesMatch = dept.facilities ? dept.facilities.toLowerCase().includes(query) : false;
+    return nameMatch || locationMatch || facilitiesMatch;
   });
 
   // Calculate summary metrics
-  const totalEmployees = departments.reduce((sum, d) => sum + d.employeeCount, 0);
+  const totalEmployees = employees.length;
   const totalBudget = departments.reduce((sum, d) => sum + d.budget, 0);
 
   return (
     <div className="space-y-6 pb-12">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 m-0">Departments</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage organizational units, staffing capacity, locations, and allocated budgets.
+          <div className="flex items-center space-x-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">
+              Department Board & Workforce Hub
+            </h1>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+              <Sparkles className="w-3 h-3" />
+              Software Office Setup
+            </span>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Organize HR, Software Engineering, QA, Cloud, and Design teams with modern tech facilities.
           </p>
         </div>
+
         <div className="flex items-center space-x-3">
+          {/* View Toggle */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setViewMode('board')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                viewMode === 'board'
+                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+              }`}
+            >
+              <Kanban className="w-4 h-4" />
+              <span>Department Board</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>Cards View</span>
+            </button>
+          </div>
+
           <Button
             onClick={handleOpenCreateModal}
             className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
@@ -267,46 +510,17 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Global Feedback Alert Banner */}
-      {feedback && (
-        <div
-          role="alert"
-          className={`p-4 rounded-xl flex items-center justify-between shadow-xs transition-all animate-fadeIn ${
-            feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-              : 'bg-rose-50 border border-rose-200 text-rose-900'
-          }`}
-        >
-          <div className="flex items-center space-x-3">
-            {feedback.type === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
-            )}
-            <span className="text-sm font-medium">{feedback.message}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-600 p-1"
-            aria-label="Dismiss notification"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
       {/* API Error Alert */}
       {apiError && (
-        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-between shadow-xs">
+        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 flex items-center justify-between shadow-xs">
           <div className="flex items-center space-x-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
             <p className="text-sm font-medium m-0">{apiError}</p>
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={loadDepartments}
+            onClick={loadData}
             className="flex items-center space-x-1.5"
           >
             <RefreshCw className="w-4 h-4" />
@@ -317,39 +531,43 @@ export const DepartmentsPage: React.FC = () => {
 
       {/* Overview Statistics Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-4">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-4">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Total Units
+              Active Divisions
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5">{departments.length}</h3>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+              {departments.length}
+            </h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-4">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-4">
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Assigned Personnel
+              Staff Members (HR & Devs)
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5">{totalEmployees}</h3>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+              {totalEmployees}
+            </h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-4">
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-4">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
             <IndianRupee className="w-5 h-5" />
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Aggregate Budget
+              Total Division Budget
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5 truncate">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5 truncate">
               {formatINR(totalBudget)}
             </h3>
           </div>
@@ -357,23 +575,23 @@ export const DepartmentsPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative flex-1 w-full sm:max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Search className="w-4 h-4" />
           </div>
           <input
             type="text"
-            placeholder="Search by department name or location..."
+            placeholder="Search divisions, floor locations, or facilities (e.g. Dual Monitors, HRMS)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-9 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            className="w-full pl-10 pr-9 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               aria-label="Clear search"
             >
               <X className="w-4 h-4" />
@@ -381,24 +599,24 @@ export const DepartmentsPage: React.FC = () => {
           )}
         </div>
 
-        <div className="text-xs font-medium text-slate-500 self-end sm:self-center">
-          Showing {filteredDepartments.length} of {departments.length} departments
+        <div className="text-xs font-medium text-slate-500 dark:text-slate-400 self-end sm:self-center">
+          Showing {filteredDepartments.length} of {departments.length} divisions
         </div>
       </div>
 
-      {/* Department Cards Grid */}
+      {/* Main Content Area: Board or Grid */}
       {isLoading ? (
-        <Loading message="Loading department records..." />
+        <Loading message="Loading software office departments and staff roster..." />
       ) : filteredDepartments.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">
-            {searchQuery ? 'No matching departments' : 'No departments found'}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-xs">
+          <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+            {searchQuery ? 'No matching divisions' : 'No departments configured'}
           </h3>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
             {searchQuery
-              ? `No departments matched "${searchQuery}". Try clearing your search query.`
-              : 'Create your first organizational department to begin assigning employees.'}
+              ? `No divisions matched "${searchQuery}". Try searching for HR, Software Development, or specific facilities.`
+              : 'Add your first software office division to begin organizing teams and assigning facilities.'}
           </p>
           <div className="mt-5">
             {searchQuery ? (
@@ -412,82 +630,288 @@ export const DepartmentsPage: React.FC = () => {
             )}
           </div>
         </div>
+      ) : viewMode === 'board' ? (
+        /* =================== DEPARTMENT BOARD (KANBAN STYLE) =================== */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+          {filteredDepartments.map((dept) => {
+            const meta = getDepartmentMeta(dept.name);
+            const Icon = meta.icon;
+            const deptEmployees = employees.filter((e) => e.departmentId === dept.id);
+            const facilitiesList = parseFacilities(dept.facilities);
+
+            return (
+              <div
+                key={dept.id}
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col transition-all hover:shadow-md"
+              >
+                {/* Board Column Header */}
+                <div className={`p-4 border-b ${meta.headerBg}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2.5 rounded-xl ${meta.bgIcon}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                          {dept.name}
+                        </h2>
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mt-0.5">
+                          {meta.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-1">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(dept)}
+                        className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors"
+                        title="Edit department"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(dept)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors"
+                        title="Delete department"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Location & Budget Row */}
+                  <div className="flex items-center justify-between text-xs mt-3 pt-2 border-t border-slate-200/50 dark:border-slate-800/60 text-slate-600 dark:text-slate-400">
+                    <span className="flex items-center gap-1 truncate max-w-[170px]">
+                      <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                      {dept.location || 'Software Bay'}
+                    </span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                      {formatINR(dept.budget)}
+                    </span>
+                  </div>
+
+                  {/* Software Office Facilities Badges */}
+                  {facilitiesList.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {facilitiesList.map((fac, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80"
+                        >
+                          {fac}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Team Members List */}
+                <div className="p-4 space-y-3 flex-1 bg-slate-50/50 dark:bg-slate-950/30 min-h-[140px]">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 px-1">
+                    <span>Team Members</span>
+                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[11px]">
+                      {deptEmployees.length}
+                    </span>
+                  </div>
+
+                  {deptEmployees.length === 0 ? (
+                    <div className="text-center py-6 px-3 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-white/50 dark:bg-slate-900/50">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 m-0">
+                        No team members currently assigned.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/employees')}
+                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2 hover:underline inline-flex items-center gap-1"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Assign Staff Member</span>
+                      </button>
+                    </div>
+                  ) : (
+                    deptEmployees.map((emp) => {
+                      const initial = emp.firstName ? emp.firstName.charAt(0).toUpperCase() : 'E';
+                      const statusColor =
+                        emp.status === 'Active'
+                          ? 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-900'
+                          : emp.status === 'OnLeave'
+                          ? 'bg-amber-500 ring-amber-200 dark:ring-amber-900'
+                          : 'bg-rose-500 ring-rose-200 dark:ring-rose-900';
+
+                      return (
+                        <div
+                          key={emp.id}
+                          className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex items-start justify-between gap-2.5"
+                        >
+                          <div className="flex items-start space-x-2.5 min-w-0">
+                            {/* Avatar with live status indicator */}
+                            <div className="relative shrink-0 mt-0.5">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs select-none">
+                                {initial}
+                              </div>
+                              <span
+                                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ${statusColor}`}
+                                title={`Status: ${emp.status}`}
+                              />
+                            </div>
+
+                            <div className="min-w-0">
+                              <h4 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-100 truncate m-0">
+                                {emp.fullName || `${emp.firstName} ${emp.lastName}`}
+                              </h4>
+                              <div className="flex items-center text-[11px] text-slate-500 dark:text-slate-400 gap-1.5 mt-0.5 truncate">
+                                <Mail className="w-3 h-3 shrink-0" />
+                                <span className="truncate">{emp.email}</span>
+                              </div>
+                              {emp.phone && (
+                                <div className="flex items-center text-[11px] text-slate-400 dark:text-slate-500 gap-1.5 mt-0.5">
+                                  <Phone className="w-3 h-3 shrink-0" />
+                                  <span>{emp.phone}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Quick Move / Reassign Action */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReassignEmployee(emp);
+                              setTargetDeptId(emp.departmentId);
+                            }}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors shrink-0"
+                            title="Reassign to another department"
+                          >
+                            <ArrowRightLeft className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Board Column Footer Action */}
+                <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/employees')}
+                    className="w-full py-1.5 px-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-colors flex items-center justify-center space-x-1.5"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Add Member to {dept.name}</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
+        /* =================== GRID CARDS VIEW =================== */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDepartments.map((dept) => (
-            <div
-              key={dept.id}
-              className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
-            >
-              <div>
-                {/* Card Top Strip */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
-                    <Building2 className="w-6 h-6" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
-                      ID #{dept.id}
-                    </span>
-                    <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                      <Users className="w-3.5 h-3.5" />
-                      <span>{dept.employeeCount} {dept.employeeCount === 1 ? 'Member' : 'Members'}</span>
-                    </span>
-                  </div>
-                </div>
+          {filteredDepartments.map((dept) => {
+            const meta = getDepartmentMeta(dept.name);
+            const Icon = meta.icon;
+            const facilitiesList = parseFacilities(dept.facilities);
 
-                {/* Name */}
-                <h3 className="text-lg font-bold text-slate-900 m-0">{dept.name}</h3>
-
-                {/* Location */}
-                <div className="flex items-center text-xs text-slate-500 mt-2">
-                  <MapPin className="w-3.5 h-3.5 mr-1 text-slate-400 shrink-0" />
-                  <span>{dept.location || 'Headquarters'}</span>
-                </div>
-              </div>
-
-              {/* Card Footer with Budget and Actions */}
-              <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between">
+            return (
+              <div
+                key={dept.id}
+                className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              >
                 <div>
-                  <span className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider block">
-                    Allocated Budget
+                  {/* Card Top Strip */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 rounded-2xl ${meta.bgIcon}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        ID #{dept.id}
+                      </span>
+                      <span className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${meta.badgeColor}`}>
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>
+                          {dept.employeeCount} {dept.employeeCount === 1 ? 'Member' : 'Members'}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Name & Subtitle */}
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
+                    {dept.name}
+                  </h3>
+                  <span className="text-xs font-medium text-slate-400 block mt-0.5">
+                    {meta.label}
                   </span>
-                  <span className="text-base font-bold text-slate-900 mt-0.5 block">
-                    {formatINR(dept.budget)}
-                  </span>
+
+                  {/* Location */}
+                  <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 mt-2">
+                    <MapPin className="w-3.5 h-3.5 mr-1 text-slate-400 shrink-0" />
+                    <span>{dept.location || 'Headquarters'}</span>
+                  </div>
+
+                  {/* Facilities list */}
+                  {facilitiesList.length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1.5">
+                        Office Facilities & Tech Stack
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {facilitiesList.map((f, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md text-[11px] border border-slate-200/80 dark:border-slate-700"
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEditModal(dept)}
-                    aria-label={`Edit ${dept.name}`}
-                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
-                    title="Edit department"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDeleteTarget(dept)}
-                    aria-label={`Delete ${dept.name}`}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                    title={
-                      dept.employeeCount > 0
-                        ? 'Contains active employees'
-                        : 'Delete department'
-                    }
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                {/* Card Footer with Budget and Actions */}
+                <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider block">
+                      Allocated Budget
+                    </span>
+                    <span className="text-base font-bold text-slate-900 dark:text-slate-100 mt-0.5 block">
+                      {formatINR(dept.budget)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(dept)}
+                      aria-label={`Edit ${dept.name}`}
+                      className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                      title="Edit department"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteTarget(dept)}
+                      aria-label={`Delete ${dept.name}`}
+                      className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                      title="Delete department"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Reusable Add / Edit Department Modal */}
+      {/* =================== ADD / EDIT DEPARTMENT MODAL =================== */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
@@ -495,24 +919,22 @@ export const DepartmentsPage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="dept-modal-title"
         >
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-fadeIn">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div>
-                <h3 id="dept-modal-title" className="text-lg font-bold text-slate-900 m-0">
-                  {departmentToEdit ? 'Edit Department' : 'Create Department'}
+                <h3 id="dept-modal-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
+                  {departmentToEdit ? 'Edit Department Profile' : 'Create Software Office Division'}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {departmentToEdit
-                    ? 'Update department profile, location, and annual budget.'
-                    : 'Establish a new organizational division for staffing assignment.'}
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Configure department division, office bay location, and tech facilities.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => !isSaving && setIsModalOpen(false)}
                 disabled={isSaving}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -525,7 +947,7 @@ export const DepartmentsPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="dept-name"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Department Name <span className="text-rose-500">*</span>
                 </label>
@@ -537,11 +959,11 @@ export const DepartmentsPage: React.FC = () => {
                     setFormData({ ...formData, name: e.target.value });
                     if (formErrors.name) setFormErrors({ ...formErrors, name: '' });
                   }}
-                  placeholder="e.g. Engineering, Human Resources, Operations"
-                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                  placeholder="e.g. Human Resources (HR), Software Development, QA"
+                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
                     formErrors.name
                       ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                      : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                      : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500'
                   }`}
                 />
                 {formErrors.name && (
@@ -549,33 +971,61 @@ export const DepartmentsPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Annual Budget (INR) */}
+              {/* Location */}
+              <div>
+                <label
+                  htmlFor="dept-location"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
+                >
+                  Location / Office Bay <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="dept-location"
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => {
+                    setFormData({ ...formData, location: e.target.value });
+                    if (formErrors.location) setFormErrors({ ...formErrors, location: '' });
+                  }}
+                  placeholder="e.g. Floor 2 - Development Bay, HR Suite - Floor 1"
+                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
+                    formErrors.location
+                      ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
+                      : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500'
+                  }`}
+                />
+                {formErrors.location && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.location}</p>
+                )}
+              </div>
+
+              {/* Annual Budget */}
               <div>
                 <label
                   htmlFor="dept-budget"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Annual Budget (₹) <span className="text-rose-500">*</span>
+                  Annual Operational Budget (₹ INR) <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative rounded-xl shadow-xs">
+                <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <IndianRupee className="w-4 h-4" />
                   </div>
                   <input
                     id="dept-budget"
                     type="number"
-                    step="1"
                     min="0"
+                    step="1000"
                     value={formData.budget}
                     onChange={(e) => {
                       setFormData({ ...formData, budget: e.target.value });
                       if (formErrors.budget) setFormErrors({ ...formErrors, budget: '' });
                     }}
-                    placeholder="2500000"
-                    className={`w-full pl-9 pr-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    placeholder="e.g. 500000"
+                    className={`w-full pl-9 pr-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
                       formErrors.budget
                         ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500'
                     }`}
                   />
                 </div>
@@ -584,45 +1034,68 @@ export const DepartmentsPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Location */}
+              {/* Software Office Facilities Input */}
               <div>
                 <label
-                  htmlFor="dept-location"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  htmlFor="dept-facilities"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Office Location <span className="text-rose-500">*</span>
+                  Office Facilities & Tech Stack
                 </label>
-                <div className="relative rounded-xl shadow-xs">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <input
-                    id="dept-location"
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => {
-                      setFormData({ ...formData, location: e.target.value });
-                      if (formErrors.location) setFormErrors({ ...formErrors, location: '' });
-                    }}
-                    placeholder="e.g. Bangalore Campus, Mumbai HQ, Floor 4"
-                    className={`w-full pl-9 pr-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
-                      formErrors.location
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
-                    }`}
-                  />
-                </div>
-                {formErrors.location && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.location}</p>
+                <input
+                  id="dept-facilities"
+                  type="text"
+                  value={formData.facilities}
+                  onChange={(e) => {
+                    setFormData({ ...formData, facilities: e.target.value });
+                    if (formErrors.facilities) setFormErrors({ ...formErrors, facilities: '' });
+                  }}
+                  placeholder="e.g. Dual Monitors, Dev Sandbox, GitHub CI/CD, HRMS Portal"
+                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
+                    formErrors.facilities
+                      ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
+                      : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500'
+                  }`}
+                />
+                {formErrors.facilities && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.facilities}</p>
                 )}
+
+                {/* Suggested Facilities Chips */}
+                <div className="mt-2.5">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    Click to Add Suggested Software Facilities:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SUGGESTED_FACILITIES.map((facility) => {
+                      const active = parseFacilities(formData.facilities).some(
+                        (f) => f.toLowerCase() === facility.toLowerCase()
+                      );
+                      return (
+                        <button
+                          key={facility}
+                          type="button"
+                          onClick={() => handleToggleSuggestedFacility(facility)}
+                          className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${
+                            active
+                              ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs font-semibold'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          {active ? `✓ ${facility}` : `+ ${facility}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {/* Modal Action Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+              {/* Form Action Buttons */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3">
                 <Button
                   type="button"
                   variant="outline"
-                  size="md"
+                  size="sm"
                   onClick={() => setIsModalOpen(false)}
                   disabled={isSaving}
                 >
@@ -630,16 +1103,12 @@ export const DepartmentsPage: React.FC = () => {
                 </Button>
                 <Button
                   type="submit"
-                  variant="primary"
-                  size="md"
+                  size="sm"
                   isLoading={isSaving}
+                  disabled={isSaving}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
-                  {isSaving
-                    ? 'Saving...'
-                    : departmentToEdit
-                    ? 'Update Department'
-                    : 'Create Department'}
+                  {departmentToEdit ? 'Save Changes' : 'Create Division'}
                 </Button>
               </div>
             </form>
@@ -647,67 +1116,132 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* =================== QUICK EMPLOYEE REASSIGN MODAL =================== */}
+      {reassignEmployee && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-800 animate-fadeIn">
+            <div className="flex items-start space-x-3">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0">
+                <ArrowRightLeft className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">
+                  Transfer / Reassign Employee
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Move <span className="font-semibold text-slate-800 dark:text-slate-200">{reassignEmployee.fullName}</span> to a different software office department.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReassignEmployee(null)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              <label htmlFor="target-dept-select" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Target Department:
+              </label>
+              <select
+                id="target-dept-select"
+                aria-label="Select Target Department"
+                value={targetDeptId}
+                onChange={(e) => setTargetDeptId(Number(e.target.value))}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name} ({d.location || 'Bay'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setReassignEmployee(null)}
+                disabled={isReassigning}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleConfirmReassign}
+                isLoading={isReassigning}
+                disabled={isReassigning || !targetDeptId}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                Confirm Transfer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================== DELETE CONFIRMATION DIALOG =================== */}
       {deleteTarget && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
-          role="alertdialog"
+          role="dialog"
           aria-modal="true"
-          aria-labelledby="delete-dept-title"
         >
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 p-6 space-y-4 animate-fadeIn">
-            <div className="flex items-center space-x-3.5 text-rose-600">
-              <div className="p-3 bg-rose-50 rounded-xl">
-                <Trash2 className="w-6 h-6" />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-800 animate-fadeIn">
+            <div className="flex items-start space-x-3">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl shrink-0">
+                <Trash2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 id="delete-dept-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">
                   Delete Department
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Permanent organizational change</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Are you sure you want to remove{' '}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    "{deleteTarget.name}"
+                  </span>
+                  ? This action cannot be reversed.
+                </p>
+                {deleteTarget.employeeCount > 0 && (
+                  <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-200 flex items-center space-x-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>
+                      This department currently contains {deleteTarget.employeeCount} active member(s). Reassign them first.
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Are you sure you want to permanently delete the{' '}
-              <strong className="text-slate-900 font-semibold">{deleteTarget.name}</strong> department
-              (ID #{deleteTarget.id})?
-            </p>
-
-            {/* Warning if employees are assigned */}
-            {deleteTarget.employeeCount > 0 ? (
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start space-x-2.5">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <div className="leading-snug">
-                  <strong>Restricted:</strong> This department currently contains{' '}
-                  <span className="font-bold">{deleteTarget.employeeCount} active employee(s)</span>.
-                  The server requires all personnel to be reassigned or deleted before this department
-                  can be removed.
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-500">
-                This unit currently has 0 assigned employees and can be safely removed.
-              </p>
-            )}
-
-            <div className="pt-2 flex items-center justify-end space-x-3">
+            <div className="mt-6 flex items-center justify-end space-x-3">
               <Button
+                type="button"
                 variant="outline"
-                size="md"
-                onClick={() => !isDeleting && setDeleteTarget(null)}
+                size="sm"
+                onClick={() => setDeleteTarget(null)}
                 disabled={isDeleting}
               >
                 Cancel
               </Button>
               <Button
+                type="button"
                 variant="danger"
-                size="md"
-                isLoading={isDeleting}
+                size="sm"
                 onClick={handleConfirmDelete}
-                className="bg-rose-600 hover:bg-rose-700 text-white shadow-xs"
+                isLoading={isDeleting}
+                disabled={isDeleting || deleteTarget.employeeCount > 0}
               >
-                {isDeleting ? 'Deleting...' : 'Confirm Delete'}
+                Delete Division
               </Button>
             </div>
           </div>

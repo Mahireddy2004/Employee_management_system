@@ -142,5 +142,140 @@ public static class DatabaseSeeder
                 await context.SaveChangesAsync();
             }
         }
+
+        // 5. Ensure Modern Software Office Departments and Facilities Setup
+        await EnsureSoftwareOfficeSetupAsync(context);
+    }
+
+    public static async Task EnsureSoftwareOfficeSetupAsync(AppDbContext context)
+    {
+        // 1. Rename 'Engineering' to 'Software Development' and configure facilities
+        var engineering = await context.Departments.FirstOrDefaultAsync(d => d.Name == "Engineering");
+        if (engineering != null)
+        {
+            engineering.Name = "Software Development";
+            engineering.Location = "Development Bay - Floor 2";
+            engineering.Facilities = "Dual Monitors, Dev Sandbox, GitHub CI/CD, Cloud Workstations";
+            engineering.Budget = 1200000m;
+        }
+
+        // 2. Configure 'Human Resources' with software office HR facilities
+        var hr = await context.Departments.FirstOrDefaultAsync(d => d.Name == "Human Resources" || d.Name == "Human Resources (HR)");
+        if (hr != null)
+        {
+            hr.Name = "Human Resources (HR)";
+            hr.Location = "HR Suite - Floor 1";
+            hr.Facilities = "HRMS Portal, Onboarding Hub, Biometric Access, Interview Suites";
+            hr.Budget = 350000m;
+        }
+        else
+        {
+            hr = new Department
+            {
+                Name = "Human Resources (HR)",
+                Location = "HR Suite - Floor 1",
+                Facilities = "HRMS Portal, Onboarding Hub, Biometric Access, Interview Suites",
+                Budget = 350000m
+            };
+            context.Departments.Add(hr);
+        }
+
+        // 3. Ensure Quality Assurance (QA)
+        var qa = await context.Departments.FirstOrDefaultAsync(d => d.Name == "Quality Assurance (QA)" || d.Name == "Marketing");
+        if (qa != null)
+        {
+            qa.Name = "Quality Assurance (QA)";
+            qa.Location = "QA Test Lab - Floor 2";
+            qa.Facilities = "Mobile Test Devices, Automated Test Rig, Bug Tracking Hub";
+            qa.Budget = 450000m;
+        }
+        else
+        {
+            qa = new Department
+            {
+                Name = "Quality Assurance (QA)",
+                Location = "QA Test Lab - Floor 2",
+                Facilities = "Mobile Test Devices, Automated Test Rig, Bug Tracking Hub",
+                Budget = 450000m
+            };
+            context.Departments.Add(qa);
+        }
+
+        // 4. Ensure DevOps & Cloud Infrastructure
+        var devops = await context.Departments.FirstOrDefaultAsync(d => d.Name == "DevOps & Cloud Infrastructure" || d.Name == "Finance");
+        if (devops != null)
+        {
+            devops.Name = "DevOps & Cloud Infrastructure";
+            devops.Location = "Server Wing - Floor 3";
+            devops.Facilities = "AWS/Azure Cloud Console, VPN Gateway, Kubernetes Cluster";
+            devops.Budget = 600000m;
+        }
+        else
+        {
+            devops = new Department
+            {
+                Name = "DevOps & Cloud Infrastructure",
+                Location = "Server Wing - Floor 3",
+                Facilities = "AWS/Azure Cloud Console, VPN Gateway, Kubernetes Cluster",
+                Budget = 600000m
+            };
+            context.Departments.Add(devops);
+        }
+
+        // 5. Ensure UI/UX & Product Design
+        if (!await context.Departments.AnyAsync(d => d.Name == "UI/UX & Product Design"))
+        {
+            context.Departments.Add(new Department
+            {
+                Name = "UI/UX & Product Design",
+                Location = "Creative Studio - Floor 1",
+                Facilities = "4K Color-Accurate Displays, Figma Enterprise, Design Library",
+                Budget = 400000m
+            });
+        }
+
+        // 6. Ensure IT Support & Office Facilities
+        if (!await context.Departments.AnyAsync(d => d.Name == "IT Support & Office Facilities"))
+        {
+            context.Departments.Add(new Department
+            {
+                Name = "IT Support & Office Facilities",
+                Location = "Helpdesk - Ground Floor",
+                Facilities = "Workstation Provisioning, Hardware Asset Depot, Gigabit LAN",
+                Budget = 300000m
+            });
+        }
+
+        await context.SaveChangesAsync();
+
+        // 7. Ensure employees are allocated across HR and Software Development
+        var hrDept = await context.Departments.FirstOrDefaultAsync(d => d.Name.Contains("Human Resources"));
+        var qaDept = await context.Departments.FirstOrDefaultAsync(d => d.Name.Contains("Quality Assurance"));
+
+        if (hrDept != null)
+        {
+            var sahithi = await context.Employees.FirstOrDefaultAsync(e => e.FirstName.ToLower().Contains("sahithi"));
+            if (sahithi != null && sahithi.DepartmentId != hrDept.Id)
+            {
+                sahithi.DepartmentId = hrDept.Id;
+            }
+
+            var parusu = await context.Employees.FirstOrDefaultAsync(e => e.FirstName.ToLower().Contains("parusu"));
+            if (parusu != null && parusu.DepartmentId != hrDept.Id)
+            {
+                parusu.DepartmentId = hrDept.Id;
+            }
+        }
+
+        if (qaDept != null)
+        {
+            var deepika = await context.Employees.FirstOrDefaultAsync(e => e.FirstName.ToLower().Contains("deepika"));
+            if (deepika != null && deepika.DepartmentId != qaDept.Id)
+            {
+                deepika.DepartmentId = qaDept.Id;
+            }
+        }
+
+        await context.SaveChangesAsync();
     }
 }

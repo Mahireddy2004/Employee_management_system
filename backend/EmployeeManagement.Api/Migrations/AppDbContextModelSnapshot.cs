@@ -74,6 +74,10 @@ namespace EmployeeManagement.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Facilities")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("Location")
                         .HasMaxLength(150)
                         .HasColumnType("varchar(150)");

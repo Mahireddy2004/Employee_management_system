@@ -40,6 +40,7 @@ public class AppDbContext : DbContext
             entity.Property(d => d.Name).IsRequired().HasMaxLength(100);
             entity.Property(d => d.Budget).HasPrecision(18, 2);
             entity.Property(d => d.Location).HasMaxLength(150);
+            entity.Property(d => d.Facilities).HasMaxLength(255);
 
             // Relationship: Department 1 -> Many Employees
             entity.HasMany(d => d.Employees)

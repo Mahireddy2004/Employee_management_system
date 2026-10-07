@@ -13,6 +13,9 @@ public class CreateDepartmentDto
 
     [MaxLength(150, ErrorMessage = "Location cannot exceed 150 characters.")]
     public string? Location { get; set; }
+
+    [MaxLength(255, ErrorMessage = "Facilities description cannot exceed 255 characters.")]
+    public string? Facilities { get; set; }
 }
 
 public class UpdateDepartmentDto
@@ -26,6 +29,9 @@ public class UpdateDepartmentDto
 
     [MaxLength(150, ErrorMessage = "Location cannot exceed 150 characters.")]
     public string? Location { get; set; }
+
+    [MaxLength(255, ErrorMessage = "Facilities description cannot exceed 255 characters.")]
+    public string? Facilities { get; set; }
 }
 
 public class DepartmentResponseDto
@@ -34,5 +40,6 @@ public class DepartmentResponseDto
     public string Name { get; set; } = string.Empty;
     public decimal Budget { get; set; }
     public string? Location { get; set; }
+    public string? Facilities { get; set; }
     public int EmployeeCount { get; set; }
 }
