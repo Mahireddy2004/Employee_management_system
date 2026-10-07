@@ -78,9 +78,9 @@ export const LeavesPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Auto-open modal if directed with ?action=apply
+  // Auto-open modal if directed with ?action=apply (Employees only)
   useEffect(() => {
-    if (searchParams.get('action') === 'apply') {
+    if (!isAdmin && searchParams.get('action') === 'apply') {
       const type = searchParams.get('type') || 'Casual';
       setApplyForm((prev) => ({ ...prev, leaveType: type }));
       setIsApplyModalOpen(true);
@@ -88,7 +88,7 @@ export const LeavesPage: React.FC = () => {
       searchParams.delete('type');
       setSearchParams(searchParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, isAdmin]);
 
   // Modal: Apply Leave (Employee)
   const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
@@ -271,59 +271,63 @@ export const LeavesPage: React.FC = () => {
             <span>Refresh</span>
           </Button>
 
-          {/* High-Visibility Header Apply Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
-              setIsApplyModalOpen(true);
-            }}
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer ring-2 ring-emerald-400/40"
-          >
-            <CalendarPlus className="w-4 h-4" />
-            <span>Apply for Leave</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Prominent Hero Action Card for "Apply for Leave" */}
-      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-indigo-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden border border-emerald-400/30">
-        <div className="absolute right-0 top-0 -mt-6 -mr-6 w-56 h-56 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="flex items-start space-x-4">
-            <div className="p-3.5 bg-white/20 rounded-2xl border border-white/30 shadow-inner shrink-0 text-white">
-              <CalendarPlus className="w-8 h-8" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2.5">
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white m-0">
-                  Apply for Leave / Time Off
-                </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white text-emerald-800 shadow-xs">
-                  Request Time Off
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-emerald-50 mt-1.5 max-w-2xl leading-relaxed">
-                Need days off for illness, personal emergency, or vacation? Submit your request here. Your manager will be notified immediately for approval.
-              </p>
-            </div>
-          </div>
-
-          <div className="shrink-0">
+          {/* High-Visibility Header Apply Button (Employees only) */}
+          {!isAdmin && (
             <button
               type="button"
               onClick={() => {
                 setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
                 setIsApplyModalOpen(true);
               }}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-sm sm:text-base shadow-2xl flex items-center justify-center space-x-2.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/40"
+              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer ring-2 ring-emerald-400/40"
             >
-              <Plus className="w-5 h-5 text-emerald-700 stroke-[3]" />
-              <span>+ Apply for Leave Now</span>
+              <CalendarPlus className="w-4 h-4" />
+              <span>Apply for Leave</span>
             </button>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* Prominent Hero Action Card for "Apply for Leave" (Employees only) */}
+      {!isAdmin && (
+        <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-indigo-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden border border-emerald-400/30">
+          <div className="absolute right-0 top-0 -mt-6 -mr-6 w-56 h-56 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div className="flex items-start space-x-4">
+              <div className="p-3.5 bg-white/20 rounded-2xl border border-white/30 shadow-inner shrink-0 text-white">
+                <CalendarPlus className="w-8 h-8" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2.5">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white m-0">
+                    Apply for Leave / Time Off
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white text-emerald-800 shadow-xs">
+                    Request Time Off
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-emerald-50 mt-1.5 max-w-2xl leading-relaxed">
+                  Need days off for illness, personal emergency, or vacation? Submit your request here. Your manager will be notified immediately for approval.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setApplyForm({ leaveType: 'Casual', startDate: '', endDate: '', reason: '' });
+                  setIsApplyModalOpen(true);
+                }}
+                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-sm sm:text-base shadow-2xl flex items-center justify-center space-x-2.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/40"
+              >
+                <Plus className="w-5 h-5 text-emerald-700 stroke-[3]" />
+                <span>+ Apply for Leave Now</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Metric Cards */}
       {isAdmin ? (
@@ -546,9 +550,11 @@ export const LeavesPage: React.FC = () => {
               : 'There are currently no active or historical leave applications.'}
           </p>
           <div className="mt-5">
-            <Button onClick={() => setIsApplyModalOpen(true)} size="sm">
-              Apply for Leave
-            </Button>
+            {!isAdmin && (
+              <Button onClick={() => setIsApplyModalOpen(true)} size="sm">
+                Apply for Leave
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -679,8 +685,8 @@ export const LeavesPage: React.FC = () => {
         </div>
       )}
 
-      {/* =================== APPLY FOR LEAVE MODAL =================== */}
-      {isApplyModalOpen && (
+      {/* =================== APPLY FOR LEAVE MODAL (Employees Only) =================== */}
+      {!isAdmin && isApplyModalOpen && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           role="dialog"

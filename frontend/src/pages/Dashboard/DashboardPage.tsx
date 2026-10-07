@@ -644,15 +644,6 @@ export const DashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <Link to="/leaves?action=apply">
-            <button
-              type="button"
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer ring-2 ring-emerald-400/30"
-            >
-              <CalendarPlus className="w-3.5 h-3.5" />
-              <span>Apply for Leave</span>
-            </button>
-          </Link>
           <Button
             variant="outline"
             size="sm"
