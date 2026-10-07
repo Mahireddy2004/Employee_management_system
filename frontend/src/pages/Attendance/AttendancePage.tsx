@@ -28,6 +28,8 @@ import type { Employee } from '../../types/employee';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
+import { QuickClockWidget } from '../../components/Attendance/QuickClockWidget';
 
 /**
  * Formats date strings (e.g. "2026-09-20T00:00:00" or "2026-09-20")
@@ -111,6 +113,10 @@ const getStatusBadgeClass = (status: AttendanceStatus | string): string => {
 const PAGE_SIZE = 10;
 
 export const AttendancePage: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
+  const [myProfile, setMyProfile] = useState<Employee | null>(null);
+
   // Data states
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -160,7 +166,7 @@ export const AttendancePage: React.FC = () => {
     }
   }, [feedback]);
 
-  // Load employees for employee filter dropdown and modal selection
+  // Load employees for employee filter dropdown and modal selection (Admins only)
   const loadEmployees = useCallback(async () => {
     try {
       const response = await employeeApi.getAll({ pageSize: 100 });
@@ -176,7 +182,7 @@ export const AttendancePage: React.FC = () => {
     setApiError(null);
     try {
       const params: AttendanceQueryParams = {};
-      if (filterEmployeeId) {
+      if (isAdmin && filterEmployeeId) {
         const empId = parseInt(filterEmployeeId, 10);
         if (!isNaN(empId) && empId > 0) {
           params.employeeId = empId;
@@ -199,12 +205,23 @@ export const AttendancePage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [filterEmployeeId, filterDate, filterStatus]);
+  }, [isAdmin, filterEmployeeId, filterDate, filterStatus]);
 
-  // Initial load
+  // Initial load: Admins load employee list; Employees load their personal profile
   useEffect(() => {
-    loadEmployees();
-  }, [loadEmployees]);
+    if (isAdmin) {
+      loadEmployees();
+    } else {
+      employeeApi
+        .getMyProfile()
+        .then((res) => {
+          setMyProfile(res);
+        })
+        .catch((err) => {
+          console.error('Failed to load employee profile for attendance:', err);
+        });
+    }
+  }, [isAdmin, loadEmployees]);
 
   useEffect(() => {
     loadAttendance();
@@ -417,22 +434,35 @@ export const AttendancePage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 m-0">
-            Attendance Management
+            {isAdmin ? 'Workforce Attendance Management' : 'My Attendance & Clock-In'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Track daily employee attendance, punctuality timestamps, and absence logs.
+            {isAdmin
+              ? 'Track organizational attendance, punctuality timestamps, and absence logs.'
+              : 'Record your daily clock-in / clock-out punches and review your personal attendance logs.'}
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={handleOpenCreateModal}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Attendance</span>
-          </Button>
-        </div>
+        {isAdmin && (
+          <div className="flex items-center space-x-3">
+            <Button
+              onClick={handleOpenCreateModal}
+              className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Attendance</span>
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* For Employees: Quick Clock-In / Clock-Out Widget Locked to This Employee */}
+      {!isAdmin && myProfile?.id && (
+        <QuickClockWidget
+          defaultEmployeeId={myProfile.id}
+          lockEmployee={true}
+          onAttendanceChanged={loadAttendance}
+        />
+      )}
 
       {/* Global Feedback Banner */}
       {feedback && (
@@ -490,7 +520,7 @@ export const AttendancePage: React.FC = () => {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Total Logs
+              {isAdmin ? 'Total Logs' : 'My Total Days'}
             </p>
             <h3 className="text-xl font-bold text-slate-900 mt-0.5">{totalCount}</h3>
           </div>
@@ -546,25 +576,27 @@ export const AttendancePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Employee Filter */}
-          <div className="flex items-center space-x-2">
-            <label htmlFor="filter-employee" className="text-xs font-medium text-slate-500 whitespace-nowrap">
-              Employee:
-            </label>
-            <select
-              id="filter-employee"
-              value={filterEmployeeId}
-              onChange={(e) => setFilterEmployeeId(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 max-w-xs"
-            >
-              <option value="">All Employees</option>
-              {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>
-                  {emp.firstName} {emp.lastName} (#{emp.id})
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Employee Filter (Admin only) */}
+          {isAdmin && (
+            <div className="flex items-center space-x-2">
+              <label htmlFor="filter-employee" className="text-xs font-medium text-slate-500 whitespace-nowrap">
+                Employee:
+              </label>
+              <select
+                id="filter-employee"
+                value={filterEmployeeId}
+                onChange={(e) => setFilterEmployeeId(e.target.value)}
+                className="px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 max-w-xs"
+              >
+                <option value="">All Employees</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.firstName} {emp.lastName} (#{emp.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Status Filter */}
           <div className="flex items-center space-x-2">
@@ -624,11 +656,11 @@ export const AttendancePage: React.FC = () => {
               <Button variant="outline" size="sm" onClick={handleClearFilters}>
                 Clear Filters
               </Button>
-            ) : (
+            ) : isAdmin ? (
               <Button onClick={handleOpenCreateModal} size="sm">
                 Add Attendance
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       ) : (
@@ -638,12 +670,12 @@ export const AttendancePage: React.FC = () => {
               <thead className="bg-slate-50/80 text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-3.5">ID</th>
-                  <th className="px-6 py-3.5">Employee</th>
+                  {isAdmin && <th className="px-6 py-3.5">Employee</th>}
                   <th className="px-6 py-3.5">Date</th>
                   <th className="px-6 py-3.5">Status</th>
                   <th className="px-6 py-3.5">Check-In</th>
                   <th className="px-6 py-3.5">Check-Out</th>
-                  <th className="px-6 py-3.5 text-right">Actions</th>
+                  {isAdmin && <th className="px-6 py-3.5 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -654,29 +686,31 @@ export const AttendancePage: React.FC = () => {
                       #{att.id}
                     </td>
 
-                    {/* Employee */}
-                    <td className="px-6 py-4 font-medium text-slate-900">
-                      <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
-                          {att.employeeName
-                            ? att.employeeName
-                                .split(' ')
-                                .map((n) => n[0])
-                                .join('')
-                                .toUpperCase()
-                                .slice(0, 2)
-                            : `E${att.employeeId}`}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-slate-900">
-                            {att.employeeName || `Employee #${att.employeeId}`}
+                    {/* Employee (Admin view only) */}
+                    {isAdmin && (
+                      <td className="px-6 py-4 font-medium text-slate-900">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
+                            {att.employeeName
+                              ? att.employeeName
+                                  .split(' ')
+                                  .map((n) => n[0])
+                                  .join('')
+                                  .toUpperCase()
+                                  .slice(0, 2)
+                              : `E${att.employeeId}`}
                           </div>
-                          {att.employeeEmail && (
-                            <div className="text-xs text-slate-400">{att.employeeEmail}</div>
-                          )}
+                          <div>
+                            <div className="font-semibold text-slate-900">
+                              {att.employeeName || `Employee #${att.employeeId}`}
+                            </div>
+                            {att.employeeEmail && (
+                              <div className="text-xs text-slate-400">{att.employeeEmail}</div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                    )}
 
                     {/* Date */}
                     <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
@@ -713,29 +747,31 @@ export const AttendancePage: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* Actions */}
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(att)}
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                          aria-label={`Edit attendance record #${att.id}`}
-                          title="Edit record"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteTarget(att)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          aria-label={`Delete attendance record #${att.id}`}
-                          title="Delete record"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+                    {/* Actions (Admin view only) */}
+                    {isAdmin && (
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditModal(att)}
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                            aria-label={`Edit attendance record #${att.id}`}
+                            title="Edit record"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(att)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            aria-label={`Delete attendance record #${att.id}`}
+                            title="Delete record"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

@@ -10,6 +10,7 @@ import {
   CalendarCheck,
   CalendarPlus,
   CheckCircle2,
+  Clock,
   IndianRupee,
   MapPin,
   PieChart as PieChartIcon,
@@ -113,6 +114,7 @@ export const DashboardPage: React.FC = () => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0);
+  const [todayStaffAttendance, setTodayStaffAttendance] = useState<Attendance[]>([]);
 
   // Employee Dashboard State
   const [myProfile, setMyProfile] = useState<Employee | null>(null);
@@ -131,14 +133,17 @@ export const DashboardPage: React.FC = () => {
     setError(null);
 
     try {
-      const [summaryData, deptsData, leaveSum] = await Promise.all([
+      const todayStr = new Date().toISOString().split('T')[0];
+      const [summaryData, deptsData, leaveSum, todayAtt] = await Promise.all([
         dashboardApi.getSummary(),
         departmentApi.getAll().catch(() => [] as Department[]),
         leaveApi.getSummary().catch(() => null),
+        attendanceApi.getAll({ date: todayStr }).catch(() => [] as Attendance[]),
       ]);
 
       setSummary(summaryData);
       setDepartments(deptsData);
+      setTodayStaffAttendance(todayAtt || []);
       if (leaveSum) {
         setPendingLeavesCount(leaveSum.pendingRequests);
       }
@@ -699,8 +704,110 @@ export const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Quick Clock-In / Clock-Out Widget for Admin testing / manual punch */}
-      <QuickClockWidget onAttendanceChanged={() => fetchAdminData(true)} />
+      {/* Today's Live Workforce Attendance Monitor (Manager / Admin View) */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 m-0">
+                  Today's Staff Clock-In Monitor
+                </h3>
+                <span className="flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Live Feed</span>
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Real-time daily punch records submitted by staff members for {new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3 text-xs shrink-0">
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
+              {todayStaffAttendance.filter((a) => a.status === 'Present' || a.status === 'Late').length} Clocked In Today
+            </div>
+            <Link
+              to="/attendance"
+              className="inline-flex items-center space-x-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold"
+            >
+              <span>Full Register</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        {todayStaffAttendance.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50/75 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase text-[11px] tracking-wider">
+                <tr>
+                  <th className="px-6 py-3 font-semibold">Employee</th>
+                  <th className="px-6 py-3 font-semibold">Clock In Time</th>
+                  <th className="px-6 py-3 font-semibold">Clock Out Time</th>
+                  <th className="px-6 py-3 font-semibold">Hours Logged</th>
+                  <th className="px-6 py-3 font-semibold text-right">Duty Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {todayStaffAttendance.map((rec) => (
+                  <tr key={rec.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-6 py-3.5">
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">
+                        {rec.employeeName || `Employee #${rec.employeeId}`}
+                      </div>
+                      <div className="text-xs text-slate-400 dark:text-slate-500">
+                        {rec.employeeEmail || `ID: ${rec.employeeId}`}
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      {rec.checkInTime || '—'}
+                    </td>
+                    <td className="px-6 py-3.5 font-mono text-xs text-slate-600 dark:text-slate-400">
+                      {rec.checkOutTime ? (
+                        rec.checkOutTime
+                      ) : (
+                        <span className="inline-flex items-center space-x-1 text-emerald-600 dark:text-emerald-400 font-sans text-xs font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Currently On Duty</span>
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3.5 font-mono text-xs text-slate-700 dark:text-slate-300">
+                      {calcHoursWorked(rec.checkInTime, rec.checkOutTime)}
+                    </td>
+                    <td className="px-6 py-3.5 text-right">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                          rec.status === 'Present'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : rec.status === 'Late'
+                            ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                            : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                        }`}
+                      >
+                        {rec.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
+            <Clock className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+            <p className="font-semibold text-slate-600 dark:text-slate-400">No employee punches recorded yet today.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              As staff members punch in from their employee portal, their live attendance will appear here automatically.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Primary KPI Cards Grid (4 Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
