@@ -246,16 +246,16 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-8 backdrop-blur-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-6 sm:p-8 backdrop-blur-sm">
           {/* Subheader with description based on active mode */}
-          <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 m-0">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                 {activeTab === 'admin' && 'Manager / Admin Portal'}
                 {activeTab === 'employee' && 'Employee Self-Service'}
                 {activeTab === 'register' && 'Join the Organization'}
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {activeTab === 'admin' && 'Oversight for staff payroll, attendance records & leave approvals.'}
                 {activeTab === 'employee' && 'Clock-in/out, check your salary slip & submit leave requests.'}
                 {activeTab === 'register' && 'Apply to join. Your manager will assign your department & salary.'}
@@ -263,17 +263,17 @@ export const LoginPage: React.FC = () => {
             </div>
             <div>
               {activeTab === 'admin' && (
-                <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 px-2.5 py-1 rounded-full">
                   Admin
                 </span>
               )}
               {activeTab === 'employee' && (
-                <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-1 rounded-full">
                   Staff
                 </span>
               )}
               {activeTab === 'register' && (
-                <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 px-2.5 py-1 rounded-full">
                   New Joiner
                 </span>
               )}
@@ -284,9 +284,9 @@ export const LoginPage: React.FC = () => {
           {successMessage && (
             <div
               role="alert"
-              className="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-start space-x-2.5 animate-fadeIn"
+              className="mb-5 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-sm flex items-start space-x-2.5 animate-fadeIn"
             >
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div className="leading-snug font-medium">{successMessage}</div>
             </div>
           )}
@@ -295,9 +295,9 @@ export const LoginPage: React.FC = () => {
           {serverError && (
             <div
               role="alert"
-              className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start space-x-2.5 animate-fadeIn"
+              className="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-200 text-sm flex items-start space-x-2.5 animate-fadeIn"
             >
-              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
               <div className="leading-snug">{serverError}</div>
             </div>
           )}
@@ -309,7 +309,7 @@ export const LoginPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
                 >
                   {activeTab === 'admin' ? 'Manager Work Email' : 'Staff Employee Email'}
                 </label>
@@ -331,15 +331,15 @@ export const LoginPage: React.FC = () => {
                     placeholder={activeTab === 'admin' ? 'admin@example.com' : 'employee@company.com'}
                     aria-invalid={!!validationErrors.email}
                     aria-describedby={validationErrors.email ? 'email-error' : undefined}
-                    className={`block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 border rounded-xl transition-all focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 dark:bg-slate-800/60 border rounded-xl transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
                       validationErrors.email
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500 focus:border-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500 focus:border-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500 focus:border-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500 focus:border-indigo-500'
                     }`}
                   />
                 </div>
                 {validationErrors.email && (
-                  <p id="email-error" className="text-xs text-rose-600 mt-1.5 font-medium flex items-center space-x-1">
+                  <p id="email-error" className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium flex items-center space-x-1">
                     <span>{validationErrors.email}</span>
                   </p>
                 )}
@@ -349,7 +349,7 @@ export const LoginPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
                 >
                   Password
                 </label>
@@ -371,23 +371,23 @@ export const LoginPage: React.FC = () => {
                     placeholder="••••••••••••"
                     aria-invalid={!!validationErrors.password}
                     aria-describedby={validationErrors.password ? 'password-error' : undefined}
-                    className={`block w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/50 border rounded-xl transition-all focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`block w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/50 dark:bg-slate-800/60 border rounded-xl transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 ${
                       validationErrors.password
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500 focus:border-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500 focus:border-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500 focus:border-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500 focus:border-indigo-500'
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {validationErrors.password && (
-                  <p id="password-error" className="text-xs text-rose-600 mt-1.5 font-medium flex items-center space-x-1">
+                  <p id="password-error" className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium flex items-center space-x-1">
                     <span>{validationErrors.password}</span>
                   </p>
                 )}
@@ -421,7 +421,7 @@ export const LoginPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="fullName"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
                 >
                   Full Name
                 </label>
@@ -440,11 +440,11 @@ export const LoginPage: React.FC = () => {
                       }
                     }}
                     placeholder="e.g. Ramesh Kumar"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 border border-slate-200 rounded-xl transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 {validationErrors.fullName && (
-                  <p className="text-xs text-rose-600 mt-1.5 font-medium">{validationErrors.fullName}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{validationErrors.fullName}</p>
                 )}
               </div>
 
@@ -452,7 +452,7 @@ export const LoginPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="regEmail"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
                 >
                   Your Email Address
                 </label>
@@ -471,11 +471,11 @@ export const LoginPage: React.FC = () => {
                       }
                     }}
                     placeholder="ramesh@gmail.com"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 border border-slate-200 rounded-xl transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 {validationErrors.regEmail && (
-                  <p className="text-xs text-rose-600 mt-1.5 font-medium">{validationErrors.regEmail}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{validationErrors.regEmail}</p>
                 )}
               </div>
 
@@ -483,7 +483,7 @@ export const LoginPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="regPassword"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
                 >
                   Create Password (min. 6 characters)
                 </label>
@@ -502,22 +502,22 @@ export const LoginPage: React.FC = () => {
                       }
                     }}
                     placeholder="••••••••••••"
-                    className="block w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/50 border border-slate-200 rounded-xl transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegPassword(!showRegPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer"
                   >
                     {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {validationErrors.regPassword && (
-                  <p className="text-xs text-rose-600 mt-1.5 font-medium">{validationErrors.regPassword}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{validationErrors.regPassword}</p>
                 )}
               </div>
 
-              <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-xs text-blue-900 leading-relaxed">
+              <div className="p-3 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl border border-blue-100 dark:border-blue-900/60 text-xs text-blue-900 dark:text-blue-200 leading-relaxed">
                 ℹ️ After joining, your employee profile will be created automatically. The admin will verify your details, assign your department, and configure your compensation.
               </div>
 
@@ -535,52 +535,52 @@ export const LoginPage: React.FC = () => {
           )}
 
           {/* Quick Demo Helper Shortcuts */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2.5">
+          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
               Quick 1-Click Demo Accounts:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleFillDemo('admin@example.com', 'Admin@123', 'admin')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50/50 hover:bg-indigo-50/50 text-left transition-all group"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/50 text-left transition-all group cursor-pointer"
               >
-                <div className="flex items-center space-x-1.5 text-indigo-600 font-bold text-xs mb-0.5">
+                <div className="flex items-center space-x-1.5 text-indigo-600 dark:text-indigo-400 font-bold text-xs mb-0.5">
                   <Shield className="w-3.5 h-3.5" />
                   <span>HR Admin</span>
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono truncate">admin@example.com</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">admin@example.com</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleFillDemo('sahithi@gmail.com', 'Employee@123', 'employee')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 bg-slate-50/50 hover:bg-emerald-50/50 text-left transition-all group"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/50 text-left transition-all group cursor-pointer"
               >
-                <div className="flex items-center space-x-1.5 text-emerald-600 font-bold text-xs mb-0.5">
+                <div className="flex items-center space-x-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs mb-0.5">
                   <Building2 className="w-3.5 h-3.5" />
                   <span>HR Staff</span>
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono truncate">sahithi@gmail.com</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">sahithi@gmail.com</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleFillDemo('nagamahendrareddy2004@gmail.com', 'Employee@123', 'employee')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 bg-slate-50/50 hover:bg-emerald-50/50 text-left transition-all group"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/50 text-left transition-all group cursor-pointer"
               >
-                <div className="flex items-center space-x-1.5 text-emerald-600 font-bold text-xs mb-0.5">
+                <div className="flex items-center space-x-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs mb-0.5">
                   <UserCheck className="w-3.5 h-3.5" />
                   <span>Dev Staff</span>
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono truncate">nagamahendra...</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">nagamahendra...</div>
               </button>
             </div>
           </div>
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-xs text-slate-500 mt-6">
+        <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
           Protected by ASP.NET Core JWT authentication & role-based security.
         </p>
       </div>

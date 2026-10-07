@@ -294,52 +294,52 @@ export const DashboardPage: React.FC = () => {
         {/* Three Primary Cards: Compensation, Leave Balance, Staff Profile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Card 1: My Salary & Compensation */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Compensation & Payroll
                 </span>
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                <div className="p-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
                   <IndianRupee className="w-5 h-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-xs text-slate-500">Estimated Monthly Salary</span>
-                <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                <span className="text-xs text-slate-500 dark:text-slate-400">Estimated Monthly Salary</span>
+                <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
                   {formatINR(monthlyGross)}
                 </h3>
-                <p className="text-xs text-emerald-600 font-medium mt-1">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
                   Annual CTC: {formatINR(myProfile?.salary ?? 0)}
                 </p>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Direct Bank Deposit</span>
-              <span className="font-semibold text-emerald-600">Active</span>
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400">Active</span>
             </div>
           </div>
 
           {/* Card 2: My Leave Entitlements */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Leave Entitlement
                 </span>
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
+                <div className="p-2 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-xs text-slate-500">Total Available Leave Balance</span>
-                <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                <span className="text-xs text-slate-500 dark:text-slate-400">Total Available Leave Balance</span>
+                <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
                   {(myLeaveSummary?.casualLeaveBalance ?? 12) +
                     (myLeaveSummary?.sickLeaveBalance ?? 10) +
                     (myLeaveSummary?.annualLeaveBalance ?? 15)}{' '}
-                  <span className="text-base font-normal text-slate-500">Days</span>
+                  <span className="text-base font-normal text-slate-500 dark:text-slate-400">Days</span>
                 </h3>
-                <div className="flex items-center space-x-3 text-xs text-slate-600 mt-2">
+                <div className="flex items-center space-x-3 text-xs text-slate-600 dark:text-slate-400 mt-2">
                   <span>Casual: {myLeaveSummary?.casualLeaveBalance ?? 12}d</span>
                   <span>•</span>
                   <span>Sick: {myLeaveSummary?.sickLeaveBalance ?? 10}d</span>
@@ -348,13 +348,13 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 {myLeaveSummary?.pendingRequests ?? 0} request pending review
               </span>
               <Link
                 to="/leaves"
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center"
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center"
               >
                 <span>View Leaves</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
@@ -363,53 +363,53 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Card 3: Staff Profile & Department */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Employee Record
                 </span>
-                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
                   <Shield className="w-5 h-5" />
                 </div>
               </div>
               <div className="mt-4 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Staff ID:</span>
-                  <span className="font-bold text-slate-900">#{myProfile?.id ?? user?.id}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Staff ID:</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100">#{myProfile?.id ?? user?.id}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Assigned Department:</span>
-                  <span className="font-semibold text-indigo-600">
+                  <span className="text-slate-500 dark:text-slate-400">Assigned Department:</span>
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                     {myProfile?.departmentName || 'Software Development'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Email:</span>
-                  <span className="font-medium text-slate-700 truncate max-w-[160px]">
+                  <span className="text-slate-500 dark:text-slate-400">Email:</span>
+                  <span className="font-medium text-slate-700 dark:text-slate-300 truncate max-w-[160px]">
                     {myProfile?.email || user?.email}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Role:</span>
-                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md font-semibold">
+                  <span className="text-slate-500 dark:text-slate-400">Role:</span>
+                  <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-md font-semibold">
                     Employee
                   </span>
                 </div>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400">
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 dark:text-slate-500">
               Department & salary changes managed by HR Admin.
             </div>
           </div>
         </div>
 
         {/* Section: Leave Balances Detailed Breakdown */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h3 className="text-base font-bold text-slate-900 m-0">Your Leave Quotas</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Your Leave Quotas</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Track your allocated balances and remaining days for the current calendar year.
               </p>
             </div>
@@ -425,17 +425,17 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                   <span>Casual Leave</span>
-                  <span className="font-bold text-slate-700">Quota: 12 days</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200">Quota: 12 days</span>
                 </div>
-                <div className="text-2xl font-extrabold text-slate-900">
+                <div className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
                   {myLeaveSummary?.casualLeaveBalance ?? 12}
-                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                  <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1.5">days left</span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-3 overflow-hidden">
                   <div
                     className="bg-indigo-600 h-2 rounded-full"
                     style={{
@@ -446,23 +446,23 @@ export const DashboardPage: React.FC = () => {
               </div>
               <Link
                 to="/leaves?action=apply&type=Casual"
-                className="block mt-3 text-center text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 py-1.5 rounded-lg border border-indigo-200 transition-colors"
+                className="block mt-3 text-center text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 transition-colors"
               >
                 + Apply Casual Leave
               </Link>
             </div>
 
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                   <span>Sick Leave</span>
-                  <span className="font-bold text-slate-700">Quota: 10 days</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200">Quota: 10 days</span>
                 </div>
-                <div className="text-2xl font-extrabold text-slate-900">
+                <div className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
                   {myLeaveSummary?.sickLeaveBalance ?? 10}
-                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                  <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1.5">days left</span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-3 overflow-hidden">
                   <div
                     className="bg-emerald-600 h-2 rounded-full"
                     style={{
@@ -473,23 +473,23 @@ export const DashboardPage: React.FC = () => {
               </div>
               <Link
                 to="/leaves?action=apply&type=Sick"
-                className="block mt-3 text-center text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 py-1.5 rounded-lg border border-emerald-200 transition-colors"
+                className="block mt-3 text-center text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors"
               >
                 + Apply Sick Leave
               </Link>
             </div>
 
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                   <span>Annual Leave</span>
-                  <span className="font-bold text-slate-700">Quota: 15 days</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200">Quota: 15 days</span>
                 </div>
-                <div className="text-2xl font-extrabold text-slate-900">
+                <div className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
                   {myLeaveSummary?.annualLeaveBalance ?? 15}
-                  <span className="text-xs font-normal text-slate-500 ml-1.5">days left</span>
+                  <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1.5">days left</span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-3 overflow-hidden">
                   <div
                     className="bg-amber-500 h-2 rounded-full"
                     style={{
@@ -500,7 +500,7 @@ export const DashboardPage: React.FC = () => {
               </div>
               <Link
                 to="/leaves?action=apply&type=Annual"
-                className="block mt-3 text-center text-xs font-bold text-amber-800 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 py-1.5 rounded-lg border border-amber-200 transition-colors"
+                className="block mt-3 text-center text-xs font-bold text-amber-800 dark:text-amber-300 hover:text-amber-900 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 py-1.5 rounded-lg border border-amber-200 dark:border-amber-800 transition-colors"
               >
                 + Apply Vacation Leave
               </Link>
@@ -509,15 +509,15 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Section: Recent Attendance Log */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900 m-0">Recent Attendance Punches</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Your most recent 5 daily check-ins and check-outs.</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Recent Attendance Punches</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your most recent 5 daily check-ins and check-outs.</p>
             </div>
             <Link
               to="/attendance"
-              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center"
+              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center"
             >
               <span>View Full History</span>
               <ArrowRight className="w-3.5 h-3.5 ml-1" />
@@ -527,7 +527,7 @@ export const DashboardPage: React.FC = () => {
           {myRecentAttendance.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50/75 border-b border-slate-100 text-slate-500 uppercase text-xs tracking-wider">
+                <thead className="bg-slate-50/75 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Date</th>
                     <th className="px-6 py-3 font-semibold">Check-In</th>
@@ -536,36 +536,36 @@ export const DashboardPage: React.FC = () => {
                     <th className="px-6 py-3 font-semibold">Hours Worked</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {myRecentAttendance.map((rec) => (
-                    <tr key={rec.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-slate-900">
+                    <tr key={rec.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-100">
                         {new Date(rec.date).toLocaleDateString('en-GB', {
                           day: '2-digit',
                           month: 'short',
                           year: 'numeric',
                         })}
                       </td>
-                      <td className="px-6 py-4 text-slate-700 font-mono text-xs">
+                      <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-mono text-xs">
                         {rec.checkInTime || '-'}
                       </td>
-                      <td className="px-6 py-4 text-slate-700 font-mono text-xs">
+                      <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-mono text-xs">
                         {rec.checkOutTime || '-'}
                       </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             rec.status === 'Present'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                               : rec.status === 'Late'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                              ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                              : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                           }`}
                         >
                           {rec.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-700 font-medium font-mono text-xs">
+                      <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-medium font-mono text-xs">
                         {calcHoursWorked(rec.checkInTime, rec.checkOutTime)}
                       </td>
                     </tr>
@@ -574,7 +574,7 @@ export const DashboardPage: React.FC = () => {
               </table>
             </div>
           ) : (
-            <div className="p-8 text-center text-slate-400 text-sm">
+            <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
               No recent attendance records found. Use the quick clock widget above to record your first punch today!
             </div>
           )}
@@ -803,74 +803,74 @@ export const DashboardPage: React.FC = () => {
       {/* Primary KPI Cards Grid (4 Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Total Employees */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Total Employees
             </span>
-            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+            <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
               <Users className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {summary?.totalEmployees ?? 0}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Registered staff members</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Registered staff members</p>
           </div>
         </div>
 
         {/* Active Staff */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Active Employees
             </span>
-            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+            <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
               <UserCheck className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {summary?.activeEmployees ?? 0}
             </h3>
-            <p className="text-xs text-emerald-600 font-medium mt-1">Currently on active duty</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">Currently on active duty</p>
           </div>
         </div>
 
         {/* On Leave */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Employees On Leave
             </span>
-            <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+            <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl">
               <CalendarCheck className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {summary?.onLeaveEmployees ?? 0}
             </h3>
-            <p className="text-xs text-amber-600 font-medium mt-1">Approved temporary leaves</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-1">Approved temporary leaves</p>
           </div>
         </div>
 
         {/* Terminated */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Terminated Employees
             </span>
-            <div className="p-2.5 bg-rose-50 text-rose-600 rounded-xl">
+            <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl">
               <UserX className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {summary?.terminatedEmployees ?? 0}
             </h3>
-            <p className="text-xs text-rose-500 font-medium mt-1">Archived / offboarded</p>
+            <p className="text-xs text-rose-500 dark:text-rose-400 font-medium mt-1">Archived / offboarded</p>
           </div>
         </div>
       </div>
@@ -878,60 +878,60 @@ export const DashboardPage: React.FC = () => {
       {/* Secondary KPI Cards Grid (3 Cards: Total Departments, Monthly Payroll, Average Attendance) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         {/* Total Departments */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0">
             <Building2 className="w-6 h-6" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Total Departments
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               {summary?.totalDepartments ?? 0}
             </h3>
-            <p className="text-xs text-slate-400 truncate mt-0.5">Organizational units</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">Organizational units</p>
           </div>
         </div>
 
         {/* Monthly Payroll */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
             <IndianRupee className="w-6 h-6" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Monthly Payroll
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5 truncate">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5 truncate">
               {formatINR(summary?.monthlyPayroll ?? 0)}
             </h3>
-            <p className="text-xs text-slate-400 truncate mt-0.5">Estimated active salary / month</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">Estimated active salary / month</p>
           </div>
         </div>
 
         {/* Average Attendance Rate */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
-          <div className="p-3 bg-teal-50 text-teal-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-4">
+          <div className="p-3 bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 rounded-xl shrink-0">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Average Attendance
             </p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-0.5">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               {summary?.averageAttendanceRate ?? 0}%
             </h3>
-            <p className="text-xs text-slate-400 truncate mt-0.5">Overall presence percentage</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">Overall presence percentage</p>
           </div>
         </div>
       </div>
 
       {/* Empty State Banner if no workforce data exists */}
       {isCompletelyEmpty && !error && (
-        <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-300">
-          <Activity className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-700">No Analytics Data Available</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+        <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+          <Activity className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">No Analytics Data Available</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
             There are currently no employees or departments recorded in the system. Populate or seed
             the database to view visual trends and distribution metrics.
           </p>
@@ -941,18 +941,18 @@ export const DashboardPage: React.FC = () => {
       {/* Analytics Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Section A: Department Distribution (PieChart) */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center space-x-2.5">
-              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-lg">
                 <PieChartIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 m-0">Department Distribution</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Employee headcount by department</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Department Distribution</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Employee headcount by department</p>
               </div>
             </div>
-            <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-900/50">
               {summary?.departmentEmployeeCounts.length ?? 0} Departments
             </span>
           </div>
@@ -998,25 +998,25 @@ export const DashboardPage: React.FC = () => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+            <div className="h-72 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
               No department headcount data available.
             </div>
           )}
         </div>
 
         {/* Section B: Monthly Hiring Trends (BarChart) */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center space-x-2.5">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+              <div className="p-2 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg">
                 <BarChart3 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 m-0">Monthly Hiring Trends</h3>
-                <p className="text-xs text-slate-500 mt-0.5">New hires over the trailing 12 months</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Monthly Hiring Trends</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">New hires over the trailing 12 months</p>
               </div>
             </div>
-            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-900/50">
               Trailing 12 Mo
             </span>
           </div>
@@ -1062,7 +1062,7 @@ export const DashboardPage: React.FC = () => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+            <div className="h-72 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
               No historical hiring records found.
             </div>
           )}
@@ -1070,15 +1070,15 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Section C: Attendance Trends (LineChart over trailing 14 days) */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-teal-50 text-teal-600 rounded-lg">
+            <div className="p-2 bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 rounded-lg">
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 m-0">Daily Attendance Trends</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Daily Attendance Trends</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Attendance breakdown across Present, Absent, Late, and Excused (Past 14 Days)
               </p>
             </div>
@@ -1086,19 +1086,19 @@ export const DashboardPage: React.FC = () => {
           <div className="flex items-center space-x-3 text-xs">
             <span className="flex items-center space-x-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span className="text-slate-600">Present</span>
+              <span className="text-slate-600 dark:text-slate-300">Present</span>
             </span>
             <span className="flex items-center space-x-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span className="text-slate-600">Late</span>
+              <span className="text-slate-600 dark:text-slate-300">Late</span>
             </span>
             <span className="flex items-center space-x-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-              <span className="text-slate-600">Excused</span>
+              <span className="text-slate-600 dark:text-slate-300">Excused</span>
             </span>
             <span className="flex items-center space-x-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-              <span className="text-slate-600">Absent</span>
+              <span className="text-slate-600 dark:text-slate-300">Absent</span>
             </span>
           </div>
         </div>
@@ -1171,22 +1171,22 @@ export const DashboardPage: React.FC = () => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-80 flex items-center justify-center text-slate-400 text-sm">
+          <div className="h-80 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
             No attendance activity recorded for the past 14 days.
           </div>
         )}
       </div>
 
       {/* Section 5: Department Summary Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900 m-0">Department Summary</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Department Summary</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Overview of department allocation, staffing levels, and assigned budgets.
             </p>
           </div>
-          <span className="text-xs font-semibold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
             {departmentSummaryList.length} Units Listed
           </span>
         </div>
@@ -1194,7 +1194,7 @@ export const DashboardPage: React.FC = () => {
         {departmentSummaryList.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50/75 border-b border-slate-100 text-slate-500 uppercase text-xs tracking-wider">
+              <thead className="bg-slate-50/75 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                 <tr>
                   <th className="px-6 py-3 font-semibold">Department Name</th>
                   <th className="px-6 py-3 font-semibold text-center">Employee Count</th>
@@ -1202,24 +1202,24 @@ export const DashboardPage: React.FC = () => {
                   <th className="px-6 py-3 font-semibold">Location</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {departmentSummaryList.map((dept) => (
-                  <tr key={dept.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-slate-900 flex items-center space-x-2.5">
+                  <tr key={dept.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2.5">
                       <div className="w-2 h-2 rounded-full bg-indigo-600 shrink-0"></div>
                       <span>{dept.name}</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/50">
                         {dept.employeeCount} {dept.employeeCount === 1 ? 'member' : 'members'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right font-medium text-slate-800">
+                    <td className="px-6 py-4 text-right font-medium text-slate-800 dark:text-slate-200">
                       {formatINR(dept.budget)}
                     </td>
-                    <td className="px-6 py-4 text-slate-500">
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
                       <div className="flex items-center space-x-1.5">
-                        <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                        <MapPin className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                         <span>{dept.location}</span>
                       </div>
                     </td>
@@ -1229,7 +1229,7 @@ export const DashboardPage: React.FC = () => {
             </table>
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-400 text-sm">
+          <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
             No departments defined yet.
           </div>
         )}

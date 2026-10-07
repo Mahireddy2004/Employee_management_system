@@ -98,15 +98,15 @@ const toPayloadTime = (timeString?: string): string | undefined => {
 const getStatusBadgeClass = (status: AttendanceStatus | string): string => {
   switch (status) {
     case 'Present':
-      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      return 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
     case 'Late':
-      return 'bg-amber-50 text-amber-700 border-amber-200';
+      return 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
     case 'Absent':
-      return 'bg-rose-50 text-rose-700 border-rose-200';
+      return 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
     case 'Excused':
-      return 'bg-blue-50 text-blue-700 border-blue-200';
+      return 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
     default:
-      return 'bg-slate-50 text-slate-700 border-slate-200';
+      return 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
   }
 };
 
@@ -431,12 +431,12 @@ export const AttendancePage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 m-0">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">
             {isAdmin ? 'Workforce Attendance Management' : 'My Attendance & Clock-In'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {isAdmin
               ? 'Track organizational attendance, punctuality timestamps, and absence logs.'
               : 'Record your daily clock-in / clock-out punches and review your personal attendance logs.'}
@@ -470,8 +470,8 @@ export const AttendancePage: React.FC = () => {
           role="alert"
           className={`p-4 rounded-xl flex items-center justify-between shadow-xs transition-all animate-fadeIn ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-              : 'bg-rose-50 border border-rose-200 text-rose-900'
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+              : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
           }`}
         >
           <div className="flex items-center space-x-3">
@@ -485,7 +485,7 @@ export const AttendancePage: React.FC = () => {
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-600 p-1 rounded-md"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-md"
             aria-label="Dismiss notification"
           >
             <X className="w-4 h-4" />
@@ -495,7 +495,7 @@ export const AttendancePage: React.FC = () => {
 
       {/* API Error State */}
       {apiError && (
-        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-between shadow-xs">
+        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 flex items-center justify-between shadow-xs">
           <div className="flex items-center space-x-3">
             <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
             <p className="text-sm font-medium m-0">{apiError}</p>
@@ -514,55 +514,55 @@ export const AttendancePage: React.FC = () => {
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
-          <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-3.5">
+          <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0">
             <CalendarCheck className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               {isAdmin ? 'Total Logs' : 'My Total Days'}
             </p>
-            <h3 className="text-xl font-bold text-slate-900 mt-0.5">{totalCount}</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{totalCount}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
-          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-3.5">
+          <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Present</p>
-            <h3 className="text-xl font-bold text-slate-900 mt-0.5">{presentCount}</h3>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Present</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{presentCount}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
-          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-3.5">
+          <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl shrink-0">
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Late</p>
-            <h3 className="text-xl font-bold text-slate-900 mt-0.5">{lateCount}</h3>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Late</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{lateCount}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
-          <div className="p-2.5 bg-rose-50 text-rose-600 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center space-x-3.5">
+          <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl shrink-0">
             <AlertCircle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Absent</p>
-            <h3 className="text-xl font-bold text-slate-900 mt-0.5">{absentCount}</h3>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Absent</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{absentCount}</h3>
           </div>
         </div>
       </div>
 
       {/* Filter Control Strip */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           {/* Date Filter */}
           <div className="flex items-center space-x-2">
-            <label htmlFor="filter-date" className="text-xs font-medium text-slate-500 whitespace-nowrap">
+            <label htmlFor="filter-date" className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
               Date:
             </label>
             <div className="relative">
@@ -571,7 +571,7 @@ export const AttendancePage: React.FC = () => {
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700"
+                className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-200"
               />
             </div>
           </div>
@@ -579,14 +579,14 @@ export const AttendancePage: React.FC = () => {
           {/* Employee Filter (Admin only) */}
           {isAdmin && (
             <div className="flex items-center space-x-2">
-              <label htmlFor="filter-employee" className="text-xs font-medium text-slate-500 whitespace-nowrap">
+              <label htmlFor="filter-employee" className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
                 Employee:
               </label>
               <select
                 id="filter-employee"
                 value={filterEmployeeId}
                 onChange={(e) => setFilterEmployeeId(e.target.value)}
-                className="px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 max-w-xs"
+                className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-200 max-w-xs"
               >
                 <option value="">All Employees</option>
                 {employees.map((emp) => (
@@ -600,14 +600,14 @@ export const AttendancePage: React.FC = () => {
 
           {/* Status Filter */}
           <div className="flex items-center space-x-2">
-            <label htmlFor="filter-status" className="text-xs font-medium text-slate-500 whitespace-nowrap">
+            <label htmlFor="filter-status" className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
               Status:
             </label>
             <select
               id="filter-status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700"
+              className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-200"
             >
               <option value="">All Statuses</option>
               <option value="Present">Present</option>
@@ -623,7 +623,7 @@ export const AttendancePage: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={handleClearFilters}
-              className="flex items-center space-x-1 text-slate-600 hover:text-slate-900"
+              className="flex items-center space-x-1 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Clear Filters</span>
@@ -631,7 +631,7 @@ export const AttendancePage: React.FC = () => {
           )}
         </div>
 
-        <div className="text-xs font-medium text-slate-500 self-end md:self-center">
+        <div className="text-xs font-medium text-slate-500 dark:text-slate-400 self-end md:self-center">
           Showing {attendances.length === 0 ? 0 : startIndex + 1}–
           {Math.min(startIndex + PAGE_SIZE, attendances.length)} of {attendances.length} records
         </div>
@@ -641,12 +641,12 @@ export const AttendancePage: React.FC = () => {
       {isLoading ? (
         <Loading message="Loading attendance records..." />
       ) : attendances.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <CalendarCheck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-xs">
+          <CalendarCheck className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
             {isFilterActive ? 'No matching attendance records' : 'No attendance entries found'}
           </h3>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
             {isFilterActive
               ? 'No attendance entries match your active filters. Try clearing or relaxing your filter parameters.'
               : 'Log your first daily employee attendance record to begin tracking.'}
@@ -664,10 +664,10 @@ export const AttendancePage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50/80 text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+              <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-6 py-3.5">ID</th>
                   {isAdmin && <th className="px-6 py-3.5">Employee</th>}
@@ -678,19 +678,19 @@ export const AttendancePage: React.FC = () => {
                   {isAdmin && <th className="px-6 py-3.5 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {paginatedAttendances.map((att) => (
-                  <tr key={att.id} className="hover:bg-slate-50/75 transition-colors">
+                  <tr key={att.id} className="hover:bg-slate-50/75 dark:hover:bg-slate-800/40 transition-colors">
                     {/* ID */}
-                    <td className="px-6 py-4 font-mono text-xs font-semibold text-slate-500">
+                    <td className="px-6 py-4 font-mono text-xs font-semibold text-slate-500 dark:text-slate-400">
                       #{att.id}
                     </td>
 
                     {/* Employee (Admin view only) */}
                     {isAdmin && (
-                      <td className="px-6 py-4 font-medium text-slate-900">
+                      <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
                         <div className="flex items-center space-x-2.5">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-bold shrink-0">
                             {att.employeeName
                               ? att.employeeName
                                   .split(' ')
@@ -701,11 +701,11 @@ export const AttendancePage: React.FC = () => {
                               : `E${att.employeeId}`}
                           </div>
                           <div>
-                            <div className="font-semibold text-slate-900">
+                            <div className="font-semibold text-slate-900 dark:text-slate-100">
                               {att.employeeName || `Employee #${att.employeeId}`}
                             </div>
                             {att.employeeEmail && (
-                              <div className="text-xs text-slate-400">{att.employeeEmail}</div>
+                              <div className="text-xs text-slate-400 dark:text-slate-500">{att.employeeEmail}</div>
                             )}
                           </div>
                         </div>
@@ -713,9 +713,9 @@ export const AttendancePage: React.FC = () => {
                     )}
 
                     {/* Date */}
-                    <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
+                    <td className="px-6 py-4 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       <div className="flex items-center space-x-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                         <span>{formatDateDisplay(att.date)}</span>
                       </div>
                     </td>
@@ -732,17 +732,17 @@ export const AttendancePage: React.FC = () => {
                     </td>
 
                     {/* Check-In */}
-                    <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
+                    <td className="px-6 py-4 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       <div className="flex items-center space-x-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                         <span className="font-mono text-xs">{formatTimeDisplay(att.checkInTime)}</span>
                       </div>
                     </td>
 
                     {/* Check-Out */}
-                    <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
+                    <td className="px-6 py-4 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       <div className="flex items-center space-x-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                         <span className="font-mono text-xs">{formatTimeDisplay(att.checkOutTime)}</span>
                       </div>
                     </td>
@@ -754,7 +754,7 @@ export const AttendancePage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenEditModal(att)}
-                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors cursor-pointer"
                             aria-label={`Edit attendance record #${att.id}`}
                             title="Edit record"
                           >
@@ -763,7 +763,7 @@ export const AttendancePage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setDeleteTarget(att)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors cursor-pointer"
                             aria-label={`Delete attendance record #${att.id}`}
                             title="Delete record"
                           >
@@ -779,10 +779,10 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* Table Footer & Pagination */}
-          <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
-            <span className="text-xs text-slate-500">
-              Page <span className="font-semibold text-slate-700">{currentPage}</span> of{' '}
-              <span className="font-semibold text-slate-700">{totalPages}</span>
+          <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-800/30">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Page <span className="font-semibold text-slate-700 dark:text-slate-300">{currentPage}</span> of{' '}
+              <span className="font-semibold text-slate-700 dark:text-slate-300">{totalPages}</span>
             </span>
 
             <div className="flex items-center space-x-2">
@@ -805,7 +805,7 @@ export const AttendancePage: React.FC = () => {
                   .map((pageNum, idx, arr) => (
                     <React.Fragment key={pageNum}>
                       {idx > 0 && arr[idx - 1] !== pageNum - 1 && (
-                        <span className="px-1 text-slate-400 text-xs">…</span>
+                        <span className="px-1 text-slate-400 dark:text-slate-500 text-xs">…</span>
                       )}
                       <button
                         type="button"
@@ -813,7 +813,7 @@ export const AttendancePage: React.FC = () => {
                         className={`w-7 h-7 text-xs font-medium rounded-lg transition-colors ${
                           currentPage === pageNum
                             ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-200/70'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                         }`}
                       >
                         {pageNum}
@@ -846,14 +846,14 @@ export const AttendancePage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="attendance-modal-title"
         >
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-fadeIn">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div>
-                <h3 id="attendance-modal-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 id="attendance-modal-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                   {editingRecord ? 'Edit Attendance Record' : 'Add Attendance Entry'}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {editingRecord
                     ? 'Modify attendance status, check-in, or check-out times.'
                     : 'Log staff attendance timestamp and status for the chosen workday.'}
@@ -863,7 +863,7 @@ export const AttendancePage: React.FC = () => {
                 type="button"
                 onClick={() => !isSaving && setIsModalOpen(false)}
                 disabled={isSaving}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -876,13 +876,13 @@ export const AttendancePage: React.FC = () => {
               <div>
                 <label
                   htmlFor="att-employee"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Employee <span className="text-rose-500">*</span>
                 </label>
                 {editingRecord ? (
-                  <div className="px-3.5 py-2 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-700 flex items-center space-x-2">
-                    <User className="w-4 h-4 text-slate-400" />
+                  <div className="px-3.5 py-2 text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 flex items-center space-x-2">
+                    <User className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                     <span>
                       {editingRecord.employeeName || `Employee #${editingRecord.employeeId}`}
                     </span>
@@ -895,10 +895,10 @@ export const AttendancePage: React.FC = () => {
                       setFormData({ ...formData, employeeId: e.target.value });
                       if (formErrors.employeeId) setFormErrors({ ...formErrors, employeeId: '' });
                     }}
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.employeeId
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   >
                     <option value="">Select Employee...</option>
@@ -910,7 +910,7 @@ export const AttendancePage: React.FC = () => {
                   </select>
                 )}
                 {formErrors.employeeId && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.employeeId}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.employeeId}</p>
                 )}
               </div>
 
@@ -918,7 +918,7 @@ export const AttendancePage: React.FC = () => {
               <div>
                 <label
                   htmlFor="att-date"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Date <span className="text-rose-500">*</span>
                 </label>
@@ -931,15 +931,15 @@ export const AttendancePage: React.FC = () => {
                       setFormData({ ...formData, date: e.target.value });
                       if (formErrors.date) setFormErrors({ ...formErrors, date: '' });
                     }}
-                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                       formErrors.date
-                        ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                        : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                        ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                     }`}
                   />
                 </div>
                 {formErrors.date && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.date}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.date}</p>
                 )}
               </div>
 
@@ -947,7 +947,7 @@ export const AttendancePage: React.FC = () => {
               <div>
                 <label
                   htmlFor="att-status"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Status <span className="text-rose-500">*</span>
                 </label>
@@ -964,10 +964,10 @@ export const AttendancePage: React.FC = () => {
                     if (formErrors.status) setFormErrors({ ...formErrors, status: '' });
                     if (formErrors.checkOutTime) setFormErrors({ ...formErrors, checkOutTime: '' });
                   }}
-                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 ${
+                  className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 ${
                     formErrors.status
-                      ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                      : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                      ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                   }`}
                 >
                   <option value="Present">Present</option>
@@ -976,7 +976,7 @@ export const AttendancePage: React.FC = () => {
                   <option value="Excused">Excused</option>
                 </select>
                 {formErrors.status && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.status}</p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.status}</p>
                 )}
               </div>
 
@@ -986,11 +986,11 @@ export const AttendancePage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="att-checkin"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Check-In Time{' '}
                     {formData.status === 'Absent' ? (
-                      <span className="text-slate-400 font-normal">(Optional)</span>
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">(Optional)</span>
                     ) : null}
                   </label>
                   <div className="relative rounded-xl">
@@ -1003,15 +1003,15 @@ export const AttendancePage: React.FC = () => {
                         setFormData({ ...formData, checkInTime: e.target.value });
                         if (formErrors.checkOutTime) setFormErrors({ ...formErrors, checkOutTime: '' });
                       }}
-                      className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 disabled:bg-slate-100 disabled:text-slate-400 ${
+                      className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 disabled:bg-slate-100 dark:disabled:bg-slate-800/40 disabled:text-slate-400 dark:disabled:text-slate-500 ${
                         formErrors.checkInTime
-                          ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                          : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                          ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                       }`}
                     />
                   </div>
                   {formErrors.checkInTime && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.checkInTime}</p>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.checkInTime}</p>
                   )}
                 </div>
 
@@ -1019,11 +1019,11 @@ export const AttendancePage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="att-checkout"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Check-Out Time{' '}
                     {formData.status === 'Absent' ? (
-                      <span className="text-slate-400 font-normal">(Optional)</span>
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">(Optional)</span>
                     ) : null}
                   </label>
                   <div className="relative rounded-xl">
@@ -1036,21 +1036,21 @@ export const AttendancePage: React.FC = () => {
                         setFormData({ ...formData, checkOutTime: e.target.value });
                         if (formErrors.checkOutTime) setFormErrors({ ...formErrors, checkOutTime: '' });
                       }}
-                      className={`w-full px-3.5 py-2 text-sm bg-slate-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 disabled:bg-slate-100 disabled:text-slate-400 ${
+                      className={`w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 disabled:bg-slate-100 dark:disabled:bg-slate-800/40 disabled:text-slate-400 dark:disabled:text-slate-500 ${
                         formErrors.checkOutTime
-                          ? 'border-rose-300 text-rose-900 focus:ring-rose-500'
-                          : 'border-slate-200 text-slate-900 focus:ring-indigo-500'
+                          ? 'border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-indigo-500'
                       }`}
                     />
                   </div>
                   {formErrors.checkOutTime && (
-                    <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.checkOutTime}</p>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">{formErrors.checkOutTime}</p>
                   )}
                 </div>
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3">
                 <Button
                   type="button"
                   variant="outline"
@@ -1083,38 +1083,38 @@ export const AttendancePage: React.FC = () => {
           aria-modal="true"
           aria-labelledby="delete-attendance-title"
         >
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 p-6 space-y-4 animate-fadeIn">
-            <div className="flex items-center space-x-3.5 text-rose-600">
-              <div className="p-3 bg-rose-50 rounded-xl">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 p-6 space-y-4 animate-fadeIn">
+            <div className="flex items-center space-x-3.5 text-rose-600 dark:text-rose-400">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/60 rounded-xl">
                 <Trash2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 id="delete-attendance-title" className="text-lg font-bold text-slate-900 m-0">
+                <h3 id="delete-attendance-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
                   Delete Attendance Record
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Confirm record deletion</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Confirm record deletion</p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Are you sure you want to permanently delete the attendance entry for{' '}
-              <strong className="text-slate-900 font-semibold">
+              <strong className="text-slate-900 dark:text-slate-100 font-semibold">
                 {deleteTarget.employeeName || `Employee #${deleteTarget.employeeId}`}
               </strong>{' '}
               on{' '}
-              <strong className="text-slate-900 font-semibold">
+              <strong className="text-slate-900 dark:text-slate-100 font-semibold">
                 {formatDateDisplay(deleteTarget.date)}
               </strong>
               ?
             </p>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-1">
               <div className="flex justify-between">
-                <span className="text-slate-400">Record ID:</span>
-                <span className="font-mono font-semibold text-slate-800">#{deleteTarget.id}</span>
+                <span className="text-slate-400 dark:text-slate-500">Record ID:</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">#{deleteTarget.id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
+                <span className="text-slate-400 dark:text-slate-500">Status:</span>
                 <span
                   className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border ${getStatusBadgeClass(
                     deleteTarget.status
@@ -1124,8 +1124,8 @@ export const AttendancePage: React.FC = () => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Timestamps:</span>
-                <span className="font-mono text-slate-800">
+                <span className="text-slate-400 dark:text-slate-500">Timestamps:</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">
                   {formatTimeDisplay(deleteTarget.checkInTime)} – {formatTimeDisplay(deleteTarget.checkOutTime)}
                 </span>
               </div>
