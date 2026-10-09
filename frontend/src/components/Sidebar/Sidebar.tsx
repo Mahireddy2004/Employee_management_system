@@ -33,7 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
       ]
     : [
         { name: 'My Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { name: 'Apply for Leave', path: '/leaves', icon: CalendarDays, highlight: true },
+        { name: 'Apply for Leave', path: '/leaves', icon: CalendarDays },
         { name: 'My Attendance', path: '/attendance', icon: CalendarCheck },
         { name: 'Department Hub', path: '/departments', icon: Building2 },
       ];
@@ -110,24 +110,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
                 to={item.path}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 select-none ${
+                  `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 select-none ${
                     isActive
                       ? 'bg-indigo-600 text-white shadow-xs font-semibold'
-                      : item.highlight
-                      ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-700/50 hover:bg-emerald-900/50'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
                   }`
                 }
               >
-                <div className="flex items-center space-x-3">
-                  <Icon className="w-5 h-5 shrink-0" />
-                  <span>{item.name}</span>
-                </div>
-                {item.highlight && (
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 shadow-xs">
-                    Apply
-                  </span>
-                )}
+                <Icon className="w-5 h-5 shrink-0" />
+                <span>{item.name}</span>
               </NavLink>
             );
           })}

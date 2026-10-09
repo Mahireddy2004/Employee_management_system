@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarPlus, LogOut, Menu, Moon, Shield, Sun } from 'lucide-react';
+import { LogOut, Menu, Moon, Shield, Sun } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Button } from '../common/Button';
@@ -52,18 +52,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
 
       {/* User Information & Actions */}
       <div className="flex items-center space-x-2 sm:space-x-3">
-        {/* Persistent "Apply for Leave" Global Quick Action Button (Employees Only) */}
-        {!isAdmin && (
-          <button
-            type="button"
-            onClick={() => navigate('/leaves?action=apply')}
-            className="flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer ring-2 ring-emerald-400/40"
-            title="Quickly apply for time off or vacation"
-          >
-            <CalendarPlus className="w-4 h-4 stroke-[2.5]" />
-            <span>Apply for Leave</span>
-          </button>
-        )}
 
         {/* Theme Toggle Button */}
         <button

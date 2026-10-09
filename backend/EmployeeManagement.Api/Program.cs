@@ -253,6 +253,10 @@ if (applyMigrationsOnStartup || seedDemoData)
             await DatabaseSeeder.SeedAsync(context);
             logger.LogInformation("Development demo data seeded successfully.");
         }
+
+        // Synchronize employee active/on-leave statuses with current calendar date and approved leaves
+        await EmployeeStatusHelper.SyncEmployeeStatusesAsync(context);
+        logger.LogInformation("Employee statuses synchronized with active leaves.");
     }
     catch (Exception ex)
     {

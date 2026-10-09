@@ -1,5 +1,6 @@
 using EmployeeManagement.Api.Data;
 using EmployeeManagement.Api.DTOs;
+using EmployeeManagement.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ public class DashboardController : ControllerBase
     [HttpGet("summary")]
     public async Task<ActionResult<DashboardSummaryDto>> GetSummary()
     {
+        await EmployeeStatusHelper.SyncEmployeeStatusesAsync(_context);
+
         // 1. Total Employees
         var totalEmployees = await _context.Employees.CountAsync();
 

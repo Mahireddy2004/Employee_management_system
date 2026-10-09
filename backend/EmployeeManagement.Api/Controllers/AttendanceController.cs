@@ -159,6 +159,15 @@ public class AttendanceController : ControllerBase
             });
         }
 
+        // If employee was marked OnLeave but is present/working today, restore status to Active
+        if (employee.Status == EmployeeStatus.OnLeave &&
+            (string.Equals(dto.Status, "Present", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(dto.Status, "Late", StringComparison.OrdinalIgnoreCase)))
+        {
+            employee.Status = EmployeeStatus.Active;
+            employee.UpdatedAt = DateTime.UtcNow;
+        }
+
         var attendance = new Attendance
         {
             EmployeeId = dto.EmployeeId,

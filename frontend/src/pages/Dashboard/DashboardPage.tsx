@@ -8,7 +8,6 @@ import {
   Building2,
   Calendar,
   CalendarCheck,
-  CalendarPlus,
   CheckCircle2,
   Clock,
   IndianRupee,
@@ -250,23 +249,26 @@ export const DashboardPage: React.FC = () => {
                   <Calendar className="w-3.5 h-3.5 text-teal-300" />
                   <span>Joined: {hireDateFormatted}</span>
                 </span>
-                <span className="flex items-center space-x-1.5 px-3 py-1 bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 rounded-xl">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Status: {myProfile?.status || 'Active'}</span>
-                </span>
+                {myProfile?.status === 'OnLeave' ? (
+                  <span className="flex items-center space-x-1.5 px-3 py-1 bg-amber-500/25 text-amber-200 border border-amber-400/40 rounded-xl">
+                    <Clock className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Status: On Leave</span>
+                  </span>
+                ) : myProfile?.status === 'Terminated' ? (
+                  <span className="flex items-center space-x-1.5 px-3 py-1 bg-rose-500/25 text-rose-200 border border-rose-400/40 rounded-xl">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-300" />
+                    <span>Status: Terminated</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center space-x-1.5 px-3 py-1 bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 rounded-xl">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Status: Active</span>
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Link to="/leaves?action=apply">
-                <button
-                  type="button"
-                  className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-sm shadow-xl flex items-center justify-center space-x-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/30"
-                >
-                  <CalendarPlus className="w-5 h-5 text-emerald-700 stroke-[2.5]" />
-                  <span>+ Apply for Leave</span>
-                </button>
-              </Link>
+            <div className="flex items-center">
               <Button
                 variant="outline"
                 size="sm"
@@ -406,22 +408,11 @@ export const DashboardPage: React.FC = () => {
 
         {/* Section: Leave Balances Detailed Breakdown */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Your Leave Quotas</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Track your allocated balances and remaining days for the current calendar year.
-              </p>
-            </div>
-            <Link to="/leaves?action=apply">
-              <button
-                type="button"
-                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer ring-2 ring-emerald-400/30"
-              >
-                <CalendarPlus className="w-3.5 h-3.5" />
-                <span>+ Apply for Leave</span>
-              </button>
-            </Link>
+          <div className="pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">Your Leave Quotas</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Track your allocated balances and remaining days for the current calendar year.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -444,12 +435,6 @@ export const DashboardPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <Link
-                to="/leaves?action=apply&type=Casual"
-                className="block mt-3 text-center text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 transition-colors"
-              >
-                + Apply Casual Leave
-              </Link>
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
@@ -471,12 +456,6 @@ export const DashboardPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <Link
-                to="/leaves?action=apply&type=Sick"
-                className="block mt-3 text-center text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors"
-              >
-                + Apply Sick Leave
-              </Link>
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
@@ -498,12 +477,6 @@ export const DashboardPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <Link
-                to="/leaves?action=apply&type=Annual"
-                className="block mt-3 text-center text-xs font-bold text-amber-800 dark:text-amber-300 hover:text-amber-900 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 py-1.5 rounded-lg border border-amber-200 dark:border-amber-800 transition-colors"
-              >
-                + Apply Vacation Leave
-              </Link>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ using EmployeeManagement.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EmployeeManagement.Api.Services;
 
 namespace EmployeeManagement.Api.Controllers;
 
@@ -274,21 +275,10 @@ public class LeavesController : ControllerBase
         leave.ProcessedAt = DateTime.UtcNow;
         leave.ProcessedBy = GetCurrentUserEmail() ?? "Admin";
 
-        // If approved and the leave dates include today, update employee status to OnLeave
-        if (leave.Employee != null)
-        {
-            var today = DateTime.UtcNow.Date;
-            if (dto.Status == LeaveStatus.Approved && today >= leave.StartDate.Date && today <= leave.EndDate.Date)
-            {
-                leave.Employee.Status = EmployeeStatus.OnLeave;
-            }
-            else if (dto.Status == LeaveStatus.Rejected && leave.Employee.Status == EmployeeStatus.OnLeave)
-            {
-                leave.Employee.Status = EmployeeStatus.Active;
-            }
-        }
-
         await _context.SaveChangesAsync();
+
+        // Keep employee statuses accurately synchronized with leave dates
+        await EmployeeStatusHelper.SyncEmployeeStatusesAsync(_context);
 
         var response = new LeaveResponseDto
         {

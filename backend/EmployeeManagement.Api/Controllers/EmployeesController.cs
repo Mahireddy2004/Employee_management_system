@@ -5,6 +5,7 @@ using EmployeeManagement.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EmployeeManagement.Api.Services;
 
 namespace EmployeeManagement.Api.Controllers;
 
@@ -35,6 +36,8 @@ public class EmployeesController : ControllerBase
     {
         page = page < 1 ? 1 : page;
         pageSize = pageSize < 1 ? 10 : (pageSize > 100 ? 100 : pageSize);
+
+        await EmployeeStatusHelper.SyncEmployeeStatusesAsync(_context);
 
         var query = _context.Employees
             .Include(e => e.Department)
@@ -100,6 +103,8 @@ public class EmployeesController : ControllerBase
         {
             return Unauthorized(new { message = "User identity claim not found in token." });
         }
+
+        await EmployeeStatusHelper.SyncEmployeeStatusesAsync(_context);
 
         var normalizedEmail = email.Trim().ToLowerInvariant();
         var employee = await _context.Employees
