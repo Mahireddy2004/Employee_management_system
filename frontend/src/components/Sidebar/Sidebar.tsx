@@ -61,15 +61,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
           <div className="flex items-center space-x-3">
             <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-xs shadow-indigo-500/20">
               <span className="block w-5 h-5 text-center font-bold leading-5" aria-hidden="true">
-                N
+                W
               </span>
             </div>
             <div>
               <span className="font-bold text-white text-base tracking-tight block leading-none">
-                Nynik
+                WorkSphere
               </span>
               <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 block mt-1">
-                Technologies
+                Enterprise HRMS
               </span>
             </div>
           </div>

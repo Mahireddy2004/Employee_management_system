@@ -75,6 +75,7 @@ public class DepartmentsController : ControllerBase
     /// <summary>
     /// POST /api/departments
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<DepartmentResponseDto>> Create([FromBody] CreateDepartmentDto dto)
     {
@@ -119,6 +120,7 @@ public class DepartmentsController : ControllerBase
     /// <summary>
     /// PUT /api/departments/{id}
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<DepartmentResponseDto>> Update(int id, [FromBody] UpdateDepartmentDto dto)
     {
@@ -168,6 +170,7 @@ public class DepartmentsController : ControllerBase
     /// DELETE /api/departments/{id}
     /// Prevents unsafe deletion if employees still belong to this department.
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -17,11 +17,7 @@ for ($attempt = 0; $attempt -lt 30; $attempt++) {
 			break
 		}
 	}
-	catch {
-		if ($backendProcess.HasExited) {
-			break
-		}
-	}
+	catch {}
 	Write-Host "." -NoNewline
 	Start-Sleep -Seconds 1
 }

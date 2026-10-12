@@ -31,3 +31,21 @@ export const PublicRoute: React.FC = () => {
   return <Outlet />;
 };
 
+export const AdminRoute: React.FC = () => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading message="Checking authorization..." />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'Admin') {
+    return <Navigate to="/departments" replace />;
+  }
+
+  return <Outlet />;
+};
+

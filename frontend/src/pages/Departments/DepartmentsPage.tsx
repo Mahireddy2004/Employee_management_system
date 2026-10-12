@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowRightLeft,
@@ -37,6 +36,7 @@ import type { Employee } from '../../types/employee';
 import { Button } from '../../components/common/Button';
 import { Loading } from '../../components/Loading/Loading';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Formats numerical budget amounts into Indian Rupee (INR) format.
@@ -183,8 +183,9 @@ const getDepartmentMeta = (name: string) => {
 };
 
 export const DepartmentsPage: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
   const toast = useToast();
-  const navigate = useNavigate();
 
   // Data states
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -198,7 +199,7 @@ export const DepartmentsPage: React.FC = () => {
   // Client-side search state
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Modal form states
+  // Modal form states (Department Add / Edit)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [departmentToEdit, setDepartmentToEdit] = useState<Department | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -215,7 +216,7 @@ export const DepartmentsPage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  // Delete dialog state
+  // Delete department dialog state
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -223,6 +224,34 @@ export const DepartmentsPage: React.FC = () => {
   const [reassignEmployee, setReassignEmployee] = useState<Employee | null>(null);
   const [targetDeptId, setTargetDeptId] = useState<number | ''>('');
   const [isReassigning, setIsReassigning] = useState<boolean>(false);
+
+  // Employee Add & Delete states (Admin only)
+  const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState<boolean>(false);
+  const [addEmployeeDept, setAddEmployeeDept] = useState<Department | null>(null);
+  const [isSavingEmployee, setIsSavingEmployee] = useState<boolean>(false);
+  const [newEmployeeForm, setNewEmployeeForm] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    salary: string;
+    hireDate: string;
+    departmentId: number | '';
+    status: 'Active' | 'OnLeave' | 'Terminated';
+  }>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    salary: '50000',
+    hireDate: new Date().toISOString().split('T')[0],
+    departmentId: '',
+    status: 'Active',
+  });
+  const [newEmployeeErrors, setNewEmployeeErrors] = useState<Record<string, string>>({});
+
+  const [deleteEmployeeTarget, setDeleteEmployeeTarget] = useState<Employee | null>(null);
+  const [isDeletingEmployee, setIsDeletingEmployee] = useState<boolean>(false);
 
   // Fetch departments and active employees list from backend API
   const loadData = useCallback(async () => {
@@ -438,6 +467,101 @@ export const DepartmentsPage: React.FC = () => {
     }
   };
 
+  // Handle Add Employee (Admin only)
+  const handleOpenAddEmployeeModal = (dept: Department) => {
+    setAddEmployeeDept(dept);
+    setNewEmployeeForm({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      salary: '50000',
+      hireDate: new Date().toISOString().split('T')[0],
+      departmentId: dept.id,
+      status: 'Active',
+    });
+    setNewEmployeeErrors({});
+    setIsAddEmployeeModalOpen(true);
+  };
+
+  const handleSubmitAddEmployee = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!newEmployeeForm.firstName.trim()) errors.firstName = 'First name is required.';
+    if (!newEmployeeForm.lastName.trim()) errors.lastName = 'Last name is required.';
+    if (!newEmployeeForm.email.trim()) errors.email = 'Email is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmployeeForm.email.trim())) {
+      errors.email = 'Please provide a valid email address.';
+    }
+    const sal = parseFloat(newEmployeeForm.salary);
+    if (!newEmployeeForm.salary.trim() || isNaN(sal) || sal <= 0) {
+      errors.salary = 'Salary must be greater than 0.';
+    }
+    if (!newEmployeeForm.departmentId) errors.departmentId = 'Department is required.';
+
+    if (Object.keys(errors).length > 0) {
+      setNewEmployeeErrors(errors);
+      return;
+    }
+
+    setIsSavingEmployee(true);
+    try {
+      await employeeApi.create({
+        firstName: newEmployeeForm.firstName.trim(),
+        lastName: newEmployeeForm.lastName.trim(),
+        email: newEmployeeForm.email.trim().toLowerCase(),
+        phone: newEmployeeForm.phone.trim() || undefined,
+        hireDate: newEmployeeForm.hireDate,
+        salary: sal,
+        departmentId: Number(newEmployeeForm.departmentId),
+        status: newEmployeeForm.status,
+      });
+      toast.success(
+        `Employee "${newEmployeeForm.firstName.trim()} ${newEmployeeForm.lastName.trim()}" added to ${
+          addEmployeeDept?.name || 'department'
+        } successfully.`
+      );
+      setIsAddEmployeeModalOpen(false);
+      loadData();
+    } catch (err: unknown) {
+      console.error('Failed to create employee:', err);
+      let errorMsg = 'Failed to create employee. Please try again.';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const ax = err as { response?: { data?: { message?: string } } };
+        if (ax.response?.data?.message) errorMsg = ax.response.data.message;
+      }
+      toast.error(errorMsg);
+    } finally {
+      setIsSavingEmployee(false);
+    }
+  };
+
+  // Handle Delete Employee (Admin only)
+  const handleConfirmDeleteEmployee = async () => {
+    if (!deleteEmployeeTarget || isDeletingEmployee) return;
+
+    setIsDeletingEmployee(true);
+    try {
+      await employeeApi.delete(deleteEmployeeTarget.id);
+      toast.success(
+        `Employee "${deleteEmployeeTarget.fullName || `${deleteEmployeeTarget.firstName} ${deleteEmployeeTarget.lastName}`}" removed successfully.`
+      );
+      setDeleteEmployeeTarget(null);
+      loadData();
+    } catch (err: unknown) {
+      console.error('Failed to delete employee:', err);
+      let errorMsg = 'Unable to delete employee. Please try again.';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const ax = err as { response?: { data?: { message?: string } } };
+        if (ax.response?.data?.message) errorMsg = ax.response.data.message;
+      }
+      toast.error(errorMsg);
+      setDeleteEmployeeTarget(null);
+    } finally {
+      setIsDeletingEmployee(false);
+    }
+  };
+
   // Filter departments by client-side search query
   const filteredDepartments = departments.filter((dept) => {
     if (!searchQuery.trim()) return true;
@@ -461,13 +585,21 @@ export const DepartmentsPage: React.FC = () => {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 m-0">
               Department Board & Workforce Hub
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                isAdmin
+                  ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+              }`}
+            >
               <Sparkles className="w-3 h-3" />
-              Software Office Setup
+              {isAdmin ? 'Software Office Management' : 'Workforce Directory (View Only)'}
             </span>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Organize HR, Software Engineering, QA, Cloud, and Design teams with modern tech facilities.
+            {isAdmin
+              ? 'Organize HR, Software Engineering, QA, Cloud, and Design teams with modern tech facilities.'
+              : 'Browse software office divisions, tech facilities, team members, and workplace locations.'}
           </p>
         </div>
 
@@ -500,13 +632,15 @@ export const DepartmentsPage: React.FC = () => {
             </button>
           </div>
 
-          <Button
-            onClick={handleOpenCreateModal}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Department</span>
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={handleOpenCreateModal}
+              className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Department</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -623,11 +757,11 @@ export const DepartmentsPage: React.FC = () => {
               <Button variant="outline" size="sm" onClick={() => setSearchQuery('')}>
                 Clear Search
               </Button>
-            ) : (
+            ) : isAdmin ? (
               <Button onClick={handleOpenCreateModal} size="sm">
                 Add Department
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       ) : viewMode === 'board' ? (
@@ -661,24 +795,26 @@ export const DepartmentsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-1">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(dept)}
-                        className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors"
-                        title="Edit department"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTarget(dept)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors"
-                        title="Delete department"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {isAdmin && (
+                      <div className="flex items-center space-x-1">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(dept)}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                          title="Edit department"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTarget(dept)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                          title="Delete department"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Location & Budget Row */}
@@ -721,14 +857,16 @@ export const DepartmentsPage: React.FC = () => {
                       <p className="text-xs text-slate-400 dark:text-slate-500 m-0">
                         No team members currently assigned.
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => navigate('/employees')}
-                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2 hover:underline inline-flex items-center gap-1"
-                      >
-                        <UserPlus className="w-3.5 h-3.5" />
-                        <span>Assign Staff Member</span>
-                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenAddEmployeeModal(dept)}
+                          className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>Assign Staff Member</span>
+                        </button>
+                      )}
                     </div>
                   ) : (
                     deptEmployees.map((emp) => {
@@ -774,35 +912,49 @@ export const DepartmentsPage: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Quick Move / Reassign Action */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setReassignEmployee(emp);
-                              setTargetDeptId(emp.departmentId);
-                            }}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors shrink-0"
-                            title="Reassign to another department"
-                          >
-                            <ArrowRightLeft className="w-3.5 h-3.5" />
-                          </button>
+                          {/* Admin Only Actions: Reassign & Delete Employee */}
+                          {isAdmin && (
+                            <div className="flex items-center space-x-0.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setReassignEmployee(emp);
+                                  setTargetDeptId(emp.departmentId);
+                                }}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                title="Reassign to another department"
+                              >
+                                <ArrowRightLeft className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeleteEmployeeTarget(emp)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                title="Delete employee"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       );
                     })
                   )}
                 </div>
 
-                {/* Board Column Footer Action */}
-                <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-center">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/employees')}
-                    className="w-full py-1.5 px-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-colors flex items-center justify-center space-x-1.5"
-                  >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    <span>Add Member to {dept.name}</span>
-                  </button>
-                </div>
+                {/* Board Column Footer Action (Admin Only) */}
+                {isAdmin && (
+                  <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-center">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddEmployeeModal(dept)}
+                      className="w-full py-1.5 px-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Add Member to {dept.name}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -884,26 +1036,28 @@ export const DepartmentsPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditModal(dept)}
-                      aria-label={`Edit ${dept.name}`}
-                      className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-                      title="Edit department"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeleteTarget(dept)}
-                      aria-label={`Delete ${dept.name}`}
-                      className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-                      title="Delete department"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {isAdmin && (
+                    <div className="flex items-center space-x-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(dept)}
+                        aria-label={`Edit ${dept.name}`}
+                        className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                        title="Edit department"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(dept)}
+                        aria-label={`Delete ${dept.name}`}
+                        className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                        title="Delete department"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -911,8 +1065,8 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* =================== ADD / EDIT DEPARTMENT MODAL =================== */}
-      {isModalOpen && (
+      {/* =================== ADD / EDIT DEPARTMENT MODAL (Admin Only) =================== */}
+      {isAdmin && isModalOpen && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           role="dialog"
@@ -1116,8 +1270,8 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* =================== QUICK EMPLOYEE REASSIGN MODAL =================== */}
-      {reassignEmployee && (
+      {/* =================== QUICK EMPLOYEE REASSIGN MODAL (Admin Only) =================== */}
+      {isAdmin && reassignEmployee && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           role="dialog"
@@ -1189,8 +1343,8 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* =================== DELETE CONFIRMATION DIALOG =================== */}
-      {deleteTarget && (
+      {/* =================== DELETE DEPARTMENT DIALOG (Admin Only) =================== */}
+      {isAdmin && deleteTarget && (
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           role="dialog"
@@ -1242,6 +1396,249 @@ export const DepartmentsPage: React.FC = () => {
                 disabled={isDeleting || deleteTarget.employeeCount > 0}
               >
                 Delete Division
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================== ADD EMPLOYEE MODAL (Admin Only) =================== */}
+      {isAdmin && isAddEmployeeModalOpen && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-fadeIn">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 m-0">
+                    Add Team Member
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Assign new employee to {addEmployeeDept?.name || 'department'}.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => !isSavingEmployee && setIsAddEmployeeModalOpen(false)}
+                disabled={isSavingEmployee}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSubmitAddEmployee} className="p-6 space-y-4 overflow-y-auto flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    First Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newEmployeeForm.firstName}
+                    onChange={(e) => {
+                      setNewEmployeeForm({ ...newEmployeeForm, firstName: e.target.value });
+                      if (newEmployeeErrors.firstName) setNewEmployeeErrors({ ...newEmployeeErrors, firstName: '' });
+                    }}
+                    placeholder="e.g. Rahul"
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {newEmployeeErrors.firstName && (
+                    <p className="text-xs text-rose-600 mt-1">{newEmployeeErrors.firstName}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    Last Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newEmployeeForm.lastName}
+                    onChange={(e) => {
+                      setNewEmployeeForm({ ...newEmployeeForm, lastName: e.target.value });
+                      if (newEmployeeErrors.lastName) setNewEmployeeErrors({ ...newEmployeeErrors, lastName: '' });
+                    }}
+                    placeholder="e.g. Sharma"
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {newEmployeeErrors.lastName && (
+                    <p className="text-xs text-rose-600 mt-1">{newEmployeeErrors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                  Work Email <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newEmployeeForm.email}
+                  onChange={(e) => {
+                    setNewEmployeeForm({ ...newEmployeeForm, email: e.target.value });
+                    if (newEmployeeErrors.email) setNewEmployeeErrors({ ...newEmployeeErrors, email: '' });
+                  }}
+                  placeholder="e.g. rahul.sharma@example.com"
+                  className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                {newEmployeeErrors.email && (
+                  <p className="text-xs text-rose-600 mt-1">{newEmployeeErrors.email}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={newEmployeeForm.phone}
+                    onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, phone: e.target.value })}
+                    placeholder="+91 98765 43210"
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    Salary (₹ INR) <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={newEmployeeForm.salary}
+                    onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, salary: e.target.value })}
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {newEmployeeErrors.salary && (
+                    <p className="text-xs text-rose-600 mt-1">{newEmployeeErrors.salary}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    Assigned Department <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={newEmployeeForm.departmentId}
+                    onChange={(e) =>
+                      setNewEmployeeForm({ ...newEmployeeForm, departmentId: Number(e.target.value) })
+                    }
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                    Hire Date <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={newEmployeeForm.hireDate}
+                    onChange={(e) => setNewEmployeeForm({ ...newEmployeeForm, hireDate: e.target.value })}
+                    className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              {/* Form Action Buttons */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsAddEmployeeModalOpen(false)}
+                  disabled={isSavingEmployee}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  isLoading={isSavingEmployee}
+                  disabled={isSavingEmployee}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  Add Member
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =================== DELETE EMPLOYEE MODAL (Admin Only) =================== */}
+      {isAdmin && deleteEmployeeTarget && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-800 animate-fadeIn">
+            <div className="flex items-start space-x-3">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 m-0">
+                  Delete Employee
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Are you sure you want to remove{' '}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    "{deleteEmployeeTarget.fullName || `${deleteEmployeeTarget.firstName} ${deleteEmployeeTarget.lastName}`}"
+                  </span>{' '}
+                  ({deleteEmployeeTarget.email}) from the organization?
+                </p>
+                <p className="text-xs text-slate-400 mt-2">
+                  This employee will be removed from their department and marked as terminated in the records.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteEmployeeTarget(null)}
+                disabled={isDeletingEmployee}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                onClick={handleConfirmDeleteEmployee}
+                isLoading={isDeletingEmployee}
+                disabled={isDeletingEmployee}
+              >
+                Delete Employee
               </Button>
             </div>
           </div>

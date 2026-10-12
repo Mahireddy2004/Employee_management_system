@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
         {/* Portal Breadcrumb / Title */}
         <div className="flex items-center space-x-2">
           <span className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base tracking-tight">
-            Nynik Portal
+            WorkSphere Portal
           </span>
           <span className="hidden sm:inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
             <Shield className={`w-3 h-3 ${isAdmin ? 'text-indigo-500' : 'text-emerald-500'}`} />

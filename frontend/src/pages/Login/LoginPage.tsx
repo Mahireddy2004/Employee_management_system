@@ -181,10 +181,10 @@ export const LoginPage: React.FC = () => {
         {/* Header Branding */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl shadow-lg shadow-indigo-500/30 text-white mb-3">
-            <span className="text-2xl font-black tracking-tight" aria-hidden="true">N</span>
+            <span className="text-2xl font-black tracking-tight" aria-hidden="true">W</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white m-0">
-            Nynik Workplace Suite
+            WorkSphere HRMS
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
             Enterprise Human Resources, Attendance & Leave Management

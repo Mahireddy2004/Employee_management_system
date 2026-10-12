@@ -142,6 +142,7 @@ public class EmployeesController : ControllerBase
     /// <summary>
     /// POST /api/employees
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<EmployeeResponseDto>> Create([FromBody] CreateEmployeeDto dto)
     {
@@ -192,6 +193,7 @@ public class EmployeesController : ControllerBase
     /// <summary>
     /// PUT /api/employees/{id}
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<EmployeeResponseDto>> Update(int id, [FromBody] UpdateEmployeeDto dto)
     {
@@ -249,6 +251,7 @@ public class EmployeesController : ControllerBase
     /// <summary>
     /// DELETE /api/employees/{id}
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -270,6 +273,7 @@ public class EmployeesController : ControllerBase
     /// <summary>
     /// POST /api/employees/bulk-create
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPost("bulk-create")]
     public async Task<ActionResult<BulkOperationResultDto>> BulkCreate([FromBody] BulkCreateEmployeeDto dto)
     {

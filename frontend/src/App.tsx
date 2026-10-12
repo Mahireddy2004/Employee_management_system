@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute/ProtectedRoute';
+import { ProtectedRoute, PublicRoute, AdminRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';
 import { Loading } from './components/Loading/Loading';
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
@@ -48,11 +48,15 @@ export const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/leaves" element={<LeavesPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
+
+            {/* Admin-only Management Routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="/employees" element={<EmployeesPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+            </Route>
           </Route>
         </Route>
 
